@@ -1,12 +1,17 @@
 import TaskItem from '../TaskItem/TaskItem';
 import styles from './TasksList.module.scss';
 import { useFetchTasks } from '../../hooks/useFetchTasks';
+import Loader from '../Loader/Loader';
 
 function TasksList() {
-  const { tasks, error } = useFetchTasks();
+  const { tasks, isLoading, error } = useFetchTasks();
 
-  if (error === '') {
-    <p>{error}</p>;
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (error !== '') {
+    return <p>{error}</p>;
   }
 
   return (
