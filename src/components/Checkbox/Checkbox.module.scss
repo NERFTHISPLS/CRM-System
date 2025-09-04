@@ -26,7 +26,7 @@
     opacity: 0.5;
     cursor: not-allowed;
 
-    + .label {
+    + div .label {
       cursor: default;
       opacity: 0.5;
     }
@@ -47,7 +47,7 @@
     color: constants.$color-white;
   }
 
-  & + .label {
+  & + div .label {
     text-decoration: line-through;
     opacity: 0.5;
   }
@@ -55,4 +55,10 @@
 
 .label {
   cursor: pointer;
+}
+
+.error {
+  color: constants.$color-red;
+  font-size: 1.4rem;
+  font-weight: 700;
 }

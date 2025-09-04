@@ -6,6 +6,7 @@ import { validateTaskText } from '../../utils/validators';
 import { ERROR_TASK_TEXT_LENGTH } from '../../utils/errors';
 import { createTask as createTaskApi } from '../../api/tasks/createTask';
 import type { Task } from '../../types/task';
+import { formatError } from '../../utils/helpers';
 
 interface Props {
   onTaskCreation: (newTask: Task) => void;
@@ -23,11 +24,20 @@ function NewTaskForm({ onTaskCreation }: Props) {
       return;
     }
 
-    setTaskText('');
     setError('');
 
-    const createdTask = await createTaskApi(taskText);
-    onTaskCreation(createdTask);
+    try {
+      const createdTask = await createTaskApi(taskText);
+      onTaskCreation(createdTask);
+      setTaskText('');
+      setError('');
+    } catch (err) {
+      console.error(err);
+
+      if (err instanceof Error) {
+        setError(formatError(err.message));
+      }
+    }
   }
 
   return (

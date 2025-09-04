@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { toggleTask as toggleTaskApi } from '../../api/tasks/toggleTask';
 import type { Task } from '../../types/task';
+import { formatError } from '../../utils/helpers';
 import Checkbox from '../Checkbox/Checkbox';
 import EditButton from '../EditButton/EditButton';
 import RemoveButton from '../RemoveButton/RemoveButton';
@@ -12,9 +14,22 @@ interface Props {
 }
 
 function TaskItem({ task, onTaskToggle }: Props) {
+  const [error, setError] = useState('');
+
   async function handleTaskToggle(checked: boolean) {
-    await toggleTaskApi(task);
-    onTaskToggle(task.id, checked);
+    setError('');
+
+    try {
+      await toggleTaskApi(task);
+      onTaskToggle(task.id, checked);
+      setError('');
+    } catch (err) {
+      console.error(err);
+
+      if (err instanceof Error) {
+        setError(formatError(err.message));
+      }
+    }
   }
 
   return (
@@ -23,6 +38,7 @@ function TaskItem({ task, onTaskToggle }: Props) {
         label={task.title}
         checked={task.isDone}
         onChange={handleTaskToggle}
+        errorMessage={error}
       />
 
       <div className={styles.control}>

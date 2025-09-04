@@ -6,9 +6,16 @@ interface Props {
   onChange: (checked: boolean) => void;
   label?: string;
   disabled?: boolean;
+  errorMessage?: string;
 }
 
-function Checkbox({ checked, label = '', disabled = false, onChange }: Props) {
+function Checkbox({
+  checked,
+  label = '',
+  disabled = false,
+  errorMessage = '',
+  onChange,
+}: Props) {
   const classes = combineClassNames(
     styles.checkbox,
     checked ? styles.checked : ''
@@ -23,7 +30,11 @@ function Checkbox({ checked, label = '', disabled = false, onChange }: Props) {
         onChange={e => onChange(e.target.checked)}
         disabled={disabled}
       />
-      <span className={styles.label}>{label}</span>
+
+      <div>
+        <span className={styles.label}>{label}</span>
+        {errorMessage !== '' && <p className={styles.error}>{errorMessage}</p>}
+      </div>
     </label>
   );
 }
