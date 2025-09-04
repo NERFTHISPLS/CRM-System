@@ -12,6 +12,11 @@
   border-radius: 7px;
 
   transition: all 0.2s;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 .small {

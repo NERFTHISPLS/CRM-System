@@ -5,9 +5,13 @@ import styles from './EditButton.module.scss';
 
 const classes = combineClassNames('material-symbols-outlined', styles.icon);
 
-function EditButton() {
+interface Props {
+  disabled?: boolean;
+}
+
+function EditButton({ disabled = false }: Props) {
   return (
-    <Button>
+    <Button disabled={disabled}>
       <span className={classes}>edit_square</span>
     </Button>
   );

@@ -6,13 +6,23 @@ import { combineClassNames } from '../../utils/helpers';
 interface Props {
   size?: 'small' | 'medium';
   type?: 'danger' | 'neutral';
+  disabled?: boolean;
   children: ReactNode;
 }
 
-function Button({ size = 'small', type = 'neutral', children }: Props) {
+function Button({
+  size = 'small',
+  type = 'neutral',
+  disabled = false,
+  children,
+}: Props) {
   const classes = combineClassNames(styles.button, styles[size], styles[type]);
 
-  return <button className={classes}>{children}</button>;
+  return (
+    <button className={classes} disabled={disabled}>
+      {children}
+    </button>
+  );
 }
 
 export default Button;
