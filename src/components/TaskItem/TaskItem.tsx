@@ -1,4 +1,7 @@
 import Checkbox from '../Checkbox/Checkbox';
+import EditButton from '../EditButton/EditButton';
+import RemoveButton from '../RemoveButton/RemoveButton';
+
 import styles from './TaskItem.module.scss';
 
 function TaskItem() {
@@ -7,8 +10,8 @@ function TaskItem() {
       <Checkbox label="Task 1" />
 
       <div className={styles.control}>
-        <button>Edit</button>
-        <button>Remove</button>
+        <EditButton />
+        <RemoveButton />
       </div>
     </li>
   );

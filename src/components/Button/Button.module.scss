@@ -1,0 +1,47 @@
+@use '/src/styles/constants';
+
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  outline: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  background: none;
+  border-radius: 7px;
+
+  transition: all 0.2s;
+}
+
+.small {
+  padding: 1rem;
+}
+
+.neutral {
+  background-color: constants.$color-blue;
+  color: constants.$color-white;
+
+  &:hover {
+    background-color: constants.$color-blue-dark;
+  }
+
+  &:focus,
+  &:active {
+    outline: 1px solid constants.$color-blue-dark;
+  }
+}
+
+.danger {
+  background-color: constants.$color-red;
+  color: constants.$color-white;
+
+  &:hover {
+    background-color: constants.$color-red-dark;
+  }
+
+  &:focus,
+  &:active {
+    outline: 1px solid constants.$color-red-dark;
+  }
+}
