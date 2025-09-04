@@ -1,12 +1,10 @@
+import Checkbox from '../Checkbox/Checkbox';
 import styles from './TaskItem.module.scss';
 
 function TaskItem() {
   return (
     <li className={styles.task}>
-      <div className={styles.info}>
-        <input type="checkbox" />
-        <p>Task 1</p>
-      </div>
+      <Checkbox label="Task 1" />
 
       <div className={styles.control}>
         <button>Edit</button>
