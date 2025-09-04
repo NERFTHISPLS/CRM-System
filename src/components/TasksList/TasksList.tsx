@@ -11,7 +11,7 @@ function TasksList() {
   }
 
   if (error !== '') {
-    return <p>{error}</p>;
+    return <p className={styles.error}>{error}</p>;
   }
 
   return (
