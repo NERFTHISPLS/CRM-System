@@ -1,11 +1,15 @@
 import TaskItem from '../TaskItem/TaskItem';
 import styles from './TasksList.module.scss';
-import { useFetchTasks } from '../../hooks/useFetchTasks';
 import Loader from '../Loader/Loader';
+import type { Task } from '../../types/task';
 
-function TasksList() {
-  const { tasks, isLoading, error } = useFetchTasks();
+interface Props {
+  tasks: Task[];
+  isLoading: boolean;
+  error: string;
+}
 
+function TasksList({ tasks, isLoading, error }: Props) {
   if (isLoading) {
     return <Loader />;
   }

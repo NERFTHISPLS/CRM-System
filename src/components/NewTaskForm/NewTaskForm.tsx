@@ -4,12 +4,18 @@ import Button from '../Button/Button';
 import styles from './NewTaskForm.module.scss';
 import { validateTaskText } from '../../utils/validators';
 import { ERROR_TASK_TEXT_LENGTH } from '../../utils/errors';
+import { createTask as createTaskApi } from '../../api/tasks/createTask';
+import type { Task } from '../../types/task';
 
-function NewTaskForm() {
+interface Props {
+  onTaskCreation: (newTask: Task) => void;
+}
+
+function NewTaskForm({ onTaskCreation }: Props) {
   const [taskText, setTaskText] = useState('');
   const [error, setError] = useState('');
 
-  function createNewTask(e: FormEvent<HTMLFormElement>): void {
+  async function createNewTask(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
 
     if (!validateTaskText(taskText)) {
@@ -20,7 +26,8 @@ function NewTaskForm() {
     setTaskText('');
     setError('');
 
-    // TODO: add request to api later
+    const createdTask = await createTaskApi(taskText);
+    onTaskCreation(createdTask);
   }
 
   return (

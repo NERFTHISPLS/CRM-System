@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { formatError } from '../utils/helpers';
-import type { MetaResponse } from '../types/general';
-import { BASE_URL } from '../utils/constants';
-import type { Task, TaskStatusCount } from '../types/task';
+import type { Task } from '../types/task';
+import { getTasks } from '../api/tasks/getTasks';
 
 export function useFetchTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -17,13 +16,9 @@ export function useFetchTasks() {
       try {
         setIsLoading(true);
 
-        const res = await fetch(`${BASE_URL}/todos`);
-        const { data } = (await res.json()) as MetaResponse<
-          Task,
-          TaskStatusCount
-        >;
+        const fetchedTasks = await getTasks();
 
-        setTasks(data);
+        setTasks(fetchedTasks);
       } catch (err) {
         console.error(err);
 

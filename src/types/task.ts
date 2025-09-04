@@ -19,3 +19,5 @@ export interface TaskStatusCount {
   completed?: number;
   inWork?: number;
 }
+
+export type TaskCreateRequest = Omit<Task, 'id' | 'created'>;
