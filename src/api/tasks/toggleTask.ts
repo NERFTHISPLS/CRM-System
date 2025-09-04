@@ -1,13 +1,13 @@
 import type { Task, TaskCreateRequest } from '../../types/task';
 import { BASE_URL } from '../../utils/constants';
 
-export async function createTask(taskText: string): Promise<Task> {
+export async function toggleTask({ id, isDone }: Task): Promise<Task> {
   const body: TaskCreateRequest = {
-    title: taskText,
+    isDone: !isDone,
   };
 
-  const res = await fetch(`${BASE_URL}/todos`, {
-    method: 'POST',
+  const res = await fetch(`${BASE_URL}/todos/${id}`, {
+    method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },

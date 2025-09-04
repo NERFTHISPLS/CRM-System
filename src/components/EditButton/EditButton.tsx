@@ -3,9 +3,9 @@ import Button from '../Button/Button';
 
 import styles from './EditButton.module.scss';
 
-function EditButton() {
-  const classes = combineClassNames('material-symbols-outlined', styles.icon);
+const classes = combineClassNames('material-symbols-outlined', styles.icon);
 
+function EditButton() {
   return (
     <Button>
       <span className={classes}>edit_square</span>

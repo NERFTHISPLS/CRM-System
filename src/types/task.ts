@@ -20,4 +20,4 @@ export interface TaskStatusCount {
   inWork?: number;
 }
 
-export type TaskCreateRequest = Omit<Task, 'id' | 'created'>;
+export type TaskCreateRequest = Partial<Omit<Task, 'id' | 'created'>>;

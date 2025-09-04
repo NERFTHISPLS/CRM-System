@@ -19,10 +19,24 @@ function AppLayout() {
     setTasks(prev => [...prev, newTask]);
   }
 
+  function handleTaskToggle(
+    targetTaskId: Task['id'],
+    isDone: Task['isDone']
+  ): void {
+    setTasks(prev =>
+      prev.map(task => (task.id === targetTaskId ? { ...task, isDone } : task))
+    );
+  }
+
   return (
     <section className={styles.todoList}>
       <NewTaskForm onTaskCreation={handleNewTask} />
-      <TasksList tasks={tasks} isLoading={isLoading} error={error} />
+      <TasksList
+        tasks={tasks}
+        isLoading={isLoading}
+        error={error}
+        onTaskToggle={handleTaskToggle}
+      />
     </section>
   );
 }

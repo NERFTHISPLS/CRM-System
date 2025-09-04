@@ -21,20 +21,25 @@
   border: 1px solid constants.$color-grey-light;
   outline: none;
   cursor: pointer;
+}
 
-  &.checked {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: constants.$color-blue;
-    position: relative;
-    border-color: constants.$color-blue;
+.checked {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: constants.$color-blue;
+  position: relative;
+  border-color: constants.$color-blue;
 
-    &::before {
-      content: '\2714';
-      font-size: 1.3rem;
-      color: constants.$color-white;
-    }
+  &::before {
+    content: '\2714';
+    font-size: 1.3rem;
+    color: constants.$color-white;
+  }
+
+  & + .label {
+    text-decoration: line-through;
+    opacity: 0.5;
   }
 }
 
