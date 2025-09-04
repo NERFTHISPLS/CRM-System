@@ -1,3 +1,5 @@
+import type { MetaResponse } from './general';
+
 export interface Task {
   id: number;
   title: string;
@@ -10,18 +12,10 @@ export interface TaskRequest {
   isDone: boolean;
 }
 
-export type GetTasksResponse = TaskMetaResponse<Task, TaskStatusCount>;
+export type GetTasksResponse = MetaResponse<Task, TaskStatusCount>;
 
-interface TaskStatusCount {
+export interface TaskStatusCount {
   all?: number;
   completed?: number;
   inWork?: number;
-}
-
-interface TaskMetaResponse<T, N> {
-  data: T[];
-  info?: N;
-  meta: {
-    totalAmount: number;
-  };
 }
