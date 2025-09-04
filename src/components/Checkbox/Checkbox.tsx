@@ -17,7 +17,7 @@ function Checkbox({ label, checked = false }: Props) {
         checked={isChecked}
         onChange={() => setIsChecked(prev => !prev)}
       />
-      <span>{label}</span>
+      <span className={styles.label}>{label}</span>
     </label>
   );
 }

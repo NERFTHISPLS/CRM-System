@@ -1,6 +1,8 @@
 .list {
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  gap: 1rem;
   font-size: 1.8rem;
   list-style: none;
 }
