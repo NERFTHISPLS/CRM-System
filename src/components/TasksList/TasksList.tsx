@@ -9,7 +9,7 @@ interface Props {
   error: string;
   onTaskToggle: (taskId: Task['id'], isDone: Task['isDone']) => void;
   onTaskTextUpdate: (taskId: Task['id'], text: Task['title']) => void;
-  onTaskRemove: (taskId: Task['id']) => void;
+  onTaskRemove: (task: Task) => void;
 }
 
 function TasksList({

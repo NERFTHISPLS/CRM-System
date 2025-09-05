@@ -1,6 +1,6 @@
 export interface MetaResponse<T, N> {
   data: T[];
-  info?: N;
+  info: N;
   meta: {
     totalAmount: number;
   };

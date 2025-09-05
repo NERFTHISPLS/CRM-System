@@ -14,10 +14,13 @@ export interface TaskRequest {
 
 export type GetTasksResponse = MetaResponse<Task, TaskStatusCount>;
 
-export interface TaskStatusCount {
-  all?: number;
-  completed?: number;
-  inWork?: number;
-}
+export type TaskStatusCount = Record<TaskFilterValue, number>;
 
 export type TaskCreateRequest = Partial<Omit<Task, 'id' | 'created'>>;
+
+export interface TaskFilter {
+  label: string;
+  value: TaskFilterValue;
+}
+
+export type TaskFilterValue = 'all' | 'completed' | 'inWork';

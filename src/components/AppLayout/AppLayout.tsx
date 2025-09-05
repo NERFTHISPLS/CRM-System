@@ -1,19 +1,29 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useFetchTasks } from '../../hooks/useFetchTasks';
 import NewTaskForm from '../NewTaskForm/NewTaskForm';
 import TasksList from '../TasksList/TasksList';
 import styles from './AppLayout.module.scss';
-import type { Task } from '../../types/task';
+import type { Task, TaskFilterValue } from '../../types/task';
+import TasksFilter from '../TasksFilter/TasksFilter';
+import { calcCountInfo, filterTasks } from '../../utils/helpers';
 
 function AppLayout() {
   const { tasks: initialTasks, isLoading, error } = useFetchTasks();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [filterValue, setFilterValue] = useState<TaskFilterValue>('all');
 
   useEffect(() => {
     if (!initialTasks.length) return;
 
     setTasks(initialTasks);
   }, [initialTasks]);
+
+  const filteredTasks = useMemo(
+    () => filterTasks(tasks, filterValue),
+    [tasks, filterValue]
+  );
+
+  const countInfo = useMemo(() => calcCountInfo(tasks), [tasks]);
 
   function handleNewTask(newTask: Task): void {
     setTasks(prev => [...prev, newTask]);
@@ -39,15 +49,22 @@ function AppLayout() {
     );
   }
 
-  function handleTaskRemove(targetTaskId: Task['id']): void {
-    setTasks(prev => prev.filter(task => task.id !== targetTaskId));
+  function handleTaskRemove(targetTask: Task): void {
+    setTasks(prev => prev.filter(task => task.id !== targetTask.id));
   }
 
   return (
     <section className={styles.todoList}>
       <NewTaskForm onTaskCreation={handleNewTask} />
+
+      <TasksFilter
+        countInfo={countInfo}
+        selected={filterValue}
+        onSelected={value => setFilterValue(value)}
+      />
+
       <TasksList
-        tasks={tasks}
+        tasks={filteredTasks}
         isLoading={isLoading}
         error={error}
         onTaskToggle={handleTaskToggle}

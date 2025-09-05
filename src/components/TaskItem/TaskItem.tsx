@@ -15,7 +15,7 @@ interface Props {
   task: Task;
   onTaskToggle: (taskId: Task['id'], isDone: Task['isDone']) => void;
   onTaskTextUpdate: (taskId: Task['id'], text: Task['title']) => void;
-  onTaskRemove: (taskId: Task['id']) => void;
+  onTaskRemove: (task: Task) => void;
 }
 
 function TaskItem({
@@ -73,7 +73,7 @@ function TaskItem({
     try {
       setIsLoading(true);
       await removeTaskApi(task.id);
-      onTaskRemove(task.id);
+      onTaskRemove(task);
       setError('');
     } catch (err) {
       handleError(err, setError);

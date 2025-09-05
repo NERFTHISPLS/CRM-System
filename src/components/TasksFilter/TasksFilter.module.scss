@@ -1,0 +1,25 @@
+@use '/src/styles/constants';
+
+.filter {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  color: constants.$color-grey;
+  font-size: 1.6rem;
+  list-style: none;
+}
+
+.filterItem {
+  cursor: pointer;
+
+  &.active {
+    color: constants.$color-blue;
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  &:hover {
+    color: constants.$color-blue-dark;
+  }
+}

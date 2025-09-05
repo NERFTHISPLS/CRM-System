@@ -16,9 +16,9 @@ export function useFetchTasks() {
       try {
         setIsLoading(true);
 
-        const fetchedTasks = await getTasks();
+        const { data } = await getTasks();
 
-        setTasks(fetchedTasks);
+        setTasks(data);
       } catch (err) {
         handleError(err, setError);
       } finally {
