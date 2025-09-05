@@ -14,12 +14,15 @@ interface Props {
 }
 
 function TaskItem({ task, onTaskToggle }: Props) {
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   async function handleTaskToggle(checked: boolean) {
     setError('');
+    setIsLoading(false);
 
     try {
+      setIsLoading(true);
       await toggleTaskApi(task);
       onTaskToggle(task.id, checked);
       setError('');
@@ -29,6 +32,8 @@ function TaskItem({ task, onTaskToggle }: Props) {
       if (err instanceof Error) {
         setError(formatError(err.message));
       }
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -39,11 +44,12 @@ function TaskItem({ task, onTaskToggle }: Props) {
         checked={task.isDone}
         onChange={handleTaskToggle}
         errorMessage={error}
+        disabled={isLoading}
       />
 
       <div className={styles.control}>
-        <EditButton />
-        <RemoveButton />
+        <EditButton disabled={isLoading} />
+        <RemoveButton disabled={isLoading} />
       </div>
     </li>
   );

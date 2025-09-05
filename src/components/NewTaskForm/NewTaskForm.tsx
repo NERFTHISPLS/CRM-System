@@ -14,6 +14,7 @@ interface Props {
 
 function NewTaskForm({ onTaskCreation }: Props) {
   const [taskText, setTaskText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   async function createNewTask(e: FormEvent<HTMLFormElement>): Promise<void> {
@@ -24,9 +25,11 @@ function NewTaskForm({ onTaskCreation }: Props) {
       return;
     }
 
+    setIsLoading(false);
     setError('');
 
     try {
+      setIsLoading(true);
       const createdTask = await createTaskApi(taskText);
       onTaskCreation(createdTask);
       setTaskText('');
@@ -37,6 +40,8 @@ function NewTaskForm({ onTaskCreation }: Props) {
       if (err instanceof Error) {
         setError(formatError(err.message));
       }
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -49,12 +54,15 @@ function NewTaskForm({ onTaskCreation }: Props) {
           placeholder="Task to be done..."
           value={taskText}
           onChange={e => setTaskText(e.target.value)}
+          disabled={isLoading}
         />
 
         {error !== '' && <p className={styles.error}>{error}</p>}
       </div>
 
-      <Button size="medium">Add</Button>
+      <Button size="medium" disabled={isLoading}>
+        Add
+      </Button>
     </form>
   );
 }
