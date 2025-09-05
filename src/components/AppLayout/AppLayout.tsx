@@ -1,61 +1,24 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useFetchTasks } from '../../hooks/useFetchTasks';
 import NewTaskForm from '../NewTaskForm/NewTaskForm';
 import TasksList from '../TasksList/TasksList';
 import styles from './AppLayout.module.scss';
-import type { Task, TaskFilterValue } from '../../types/task';
+import type { TaskFilterValue } from '../../types/task';
 import TasksFilter from '../TasksFilter/TasksFilter';
-import { calcCountInfo, filterTasks } from '../../utils/helpers';
+import Loader from '../Loader/Loader';
 
 function AppLayout() {
-  const { tasks: initialTasks, isLoading, error } = useFetchTasks();
-  const [tasks, setTasks] = useState<Task[]>([]);
   const [filterValue, setFilterValue] = useState<TaskFilterValue>('all');
+  const { tasks, countInfo, isLoading, error, refetch } =
+    useFetchTasks(filterValue);
 
-  useEffect(() => {
-    if (!initialTasks.length) return;
-
-    setTasks(initialTasks);
-  }, [initialTasks]);
-
-  const filteredTasks = useMemo(
-    () => filterTasks(tasks, filterValue),
-    [tasks, filterValue]
-  );
-
-  const countInfo = useMemo(() => calcCountInfo(tasks), [tasks]);
-
-  function handleNewTask(newTask: Task): void {
-    setTasks(prev => [...prev, newTask]);
-  }
-
-  function handleTaskToggle(
-    targetTaskId: Task['id'],
-    isDone: Task['isDone']
-  ): void {
-    setTasks(prev =>
-      prev.map(task => (task.id === targetTaskId ? { ...task, isDone } : task))
-    );
-  }
-
-  function handleTaskTextUpdate(
-    targetTaskId: Task['id'],
-    text: Task['title']
-  ): void {
-    setTasks(prev =>
-      prev.map(task =>
-        task.id === targetTaskId ? { ...task, title: text } : task
-      )
-    );
-  }
-
-  function handleTaskRemove(targetTask: Task): void {
-    setTasks(prev => prev.filter(task => task.id !== targetTask.id));
+  if (isLoading) {
+    return <Loader />;
   }
 
   return (
     <section className={styles.todoList}>
-      <NewTaskForm onTaskCreation={handleNewTask} />
+      <NewTaskForm refetchTasks={() => refetch(false)} />
 
       <TasksFilter
         countInfo={countInfo}
@@ -64,12 +27,9 @@ function AppLayout() {
       />
 
       <TasksList
-        tasks={filteredTasks}
-        isLoading={isLoading}
+        tasks={tasks}
         error={error}
-        onTaskToggle={handleTaskToggle}
-        onTaskTextUpdate={handleTaskTextUpdate}
-        onTaskRemove={handleTaskRemove}
+        refetchTasks={() => refetch(false)}
       />
     </section>
   );

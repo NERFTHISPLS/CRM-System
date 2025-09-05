@@ -1,29 +1,14 @@
 import TaskItem from '../TaskItem/TaskItem';
 import styles from './TasksList.module.scss';
-import Loader from '../Loader/Loader';
 import type { Task } from '../../types/task';
 
 interface Props {
   tasks: Task[];
-  isLoading: boolean;
   error: string;
-  onTaskToggle: (taskId: Task['id'], isDone: Task['isDone']) => void;
-  onTaskTextUpdate: (taskId: Task['id'], text: Task['title']) => void;
-  onTaskRemove: (task: Task) => void;
+  refetchTasks: () => Promise<void>;
 }
 
-function TasksList({
-  tasks,
-  isLoading,
-  error,
-  onTaskToggle,
-  onTaskTextUpdate,
-  onTaskRemove,
-}: Props) {
-  if (isLoading) {
-    return <Loader />;
-  }
-
+function TasksList({ tasks, error, refetchTasks }: Props) {
   if (error !== '') {
     return <p className={styles.error}>{error}</p>;
   }
@@ -31,13 +16,7 @@ function TasksList({
   return (
     <ul className={styles.list}>
       {tasks.map(task => (
-        <TaskItem
-          key={task.id}
-          task={task}
-          onTaskToggle={onTaskToggle}
-          onTaskTextUpdate={onTaskTextUpdate}
-          onTaskRemove={onTaskRemove}
-        />
+        <TaskItem key={task.id} task={task} refetchTasks={refetchTasks} />
       ))}
     </ul>
   );

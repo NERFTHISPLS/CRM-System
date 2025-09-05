@@ -5,15 +5,14 @@ import styles from './NewTaskForm.module.scss';
 import { validateTaskText } from '../../utils/validators';
 import { ERROR_TASK_TEXT_LENGTH } from '../../utils/errors';
 import { createTask as createTaskApi } from '../../api/tasks/createTask';
-import type { Task } from '../../types/task';
 import { handleError } from '../../utils/helpers';
 import TextInput from '../TextInput/TextInput';
 
 interface Props {
-  onTaskCreation: (newTask: Task) => void;
+  refetchTasks: () => Promise<void>;
 }
 
-function NewTaskForm({ onTaskCreation }: Props) {
+function NewTaskForm({ refetchTasks }: Props) {
   const [taskText, setTaskText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -31,8 +30,8 @@ function NewTaskForm({ onTaskCreation }: Props) {
 
     try {
       setIsLoading(true);
-      const createdTask = await createTaskApi(taskText);
-      onTaskCreation(createdTask);
+      await createTaskApi(taskText);
+      await refetchTasks();
       setTaskText('');
       setError('');
     } catch (err) {

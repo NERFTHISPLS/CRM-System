@@ -13,17 +13,10 @@ import { removeTask as removeTaskApi } from '../../api/tasks/removeTask';
 
 interface Props {
   task: Task;
-  onTaskToggle: (taskId: Task['id'], isDone: Task['isDone']) => void;
-  onTaskTextUpdate: (taskId: Task['id'], text: Task['title']) => void;
-  onTaskRemove: (task: Task) => void;
+  refetchTasks: () => Promise<void>;
 }
 
-function TaskItem({
-  task,
-  onTaskToggle,
-  onTaskTextUpdate,
-  onTaskRemove,
-}: Props) {
+function TaskItem({ task, refetchTasks }: Props) {
   const [taskTextEdit, setTaskTextEdit] = useState('');
   const [isEditSession, setIsEditSession] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,14 +26,14 @@ function TaskItem({
     setTaskTextEdit(task.title);
   }, [task.title, isEditSession]);
 
-  async function handleTaskToggle(checked: boolean): Promise<void> {
+  async function handleTaskToggle(): Promise<void> {
     setError('');
     setIsLoading(false);
 
     try {
       setIsLoading(true);
       await toggleTaskApi(task.id, task.isDone);
-      onTaskToggle(task.id, checked);
+      await refetchTasks();
       setError('');
     } catch (err) {
       handleError(err, setError);
@@ -56,7 +49,7 @@ function TaskItem({
     try {
       setIsLoading(true);
       await updateTaskTitleApi(task.id, taskTextEdit);
-      onTaskTextUpdate(task.id, taskTextEdit);
+      await refetchTasks();
       setError('');
     } catch (err) {
       handleError(err, setError);
@@ -73,7 +66,7 @@ function TaskItem({
     try {
       setIsLoading(true);
       await removeTaskApi(task.id);
-      onTaskRemove(task);
+      await refetchTasks();
       setError('');
     } catch (err) {
       handleError(err, setError);
