@@ -1,13 +1,11 @@
 import type { Task, TaskCreateRequest } from '../../types/task';
 import { BASE_URL } from '../../utils/constants';
 
-export async function toggleTask(
+export async function updateTaskTitle(
   id: Task['id'],
-  isDone: Task['isDone']
+  title: Task['title']
 ): Promise<Task> {
-  const body: TaskCreateRequest = {
-    isDone: !isDone,
-  };
+  const body: TaskCreateRequest = { title };
 
   const res = await fetch(`${BASE_URL}/todos/${id}`, {
     method: 'PUT',

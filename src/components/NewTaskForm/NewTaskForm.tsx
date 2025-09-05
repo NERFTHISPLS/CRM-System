@@ -7,6 +7,7 @@ import { ERROR_TASK_TEXT_LENGTH } from '../../utils/errors';
 import { createTask as createTaskApi } from '../../api/tasks/createTask';
 import type { Task } from '../../types/task';
 import { formatError } from '../../utils/helpers';
+import TextInput from '../TextInput/TextInput';
 
 interface Props {
   onTaskCreation: (newTask: Task) => void;
@@ -47,18 +48,13 @@ function NewTaskForm({ onTaskCreation }: Props) {
 
   return (
     <form className={styles.form} onSubmit={createNewTask}>
-      <div className={styles.inputWrapper}>
-        <input
-          className={styles.input}
-          type="text"
-          placeholder="Task to be done..."
-          value={taskText}
-          onChange={e => setTaskText(e.target.value)}
-          disabled={isLoading}
-        />
-
-        {error !== '' && <p className={styles.error}>{error}</p>}
-      </div>
+      <TextInput
+        value={taskText}
+        placeholder="Task to be done..."
+        disabled={isLoading}
+        onChange={setTaskText}
+        errorText={error}
+      />
 
       <Button size="medium" disabled={isLoading}>
         Add

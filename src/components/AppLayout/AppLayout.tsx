@@ -28,6 +28,17 @@ function AppLayout() {
     );
   }
 
+  function handleTaskTextUpdate(
+    targetTaskId: Task['id'],
+    text: Task['title']
+  ): void {
+    setTasks(prev =>
+      prev.map(task =>
+        task.id === targetTaskId ? { ...task, title: text } : task
+      )
+    );
+  }
+
   return (
     <section className={styles.todoList}>
       <NewTaskForm onTaskCreation={handleNewTask} />
@@ -36,6 +47,7 @@ function AppLayout() {
         isLoading={isLoading}
         error={error}
         onTaskToggle={handleTaskToggle}
+        onTaskTextUpdate={handleTaskTextUpdate}
       />
     </section>
   );

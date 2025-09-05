@@ -7,11 +7,12 @@ const classes = combineClassNames('material-symbols-outlined', styles.icon);
 
 interface Props {
   disabled?: boolean;
+  onClick: () => void;
 }
 
-function EditButton({ disabled = false }: Props) {
+function EditButton({ disabled = false, onClick }: Props) {
   return (
-    <Button disabled={disabled}>
+    <Button disabled={disabled} onClick={onClick}>
       <span className={classes}>edit_square</span>
     </Button>
   );

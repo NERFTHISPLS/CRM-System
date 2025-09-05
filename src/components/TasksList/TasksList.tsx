@@ -8,9 +8,16 @@ interface Props {
   isLoading: boolean;
   error: string;
   onTaskToggle: (taskId: Task['id'], isDone: Task['isDone']) => void;
+  onTaskTextUpdate: (taskId: Task['id'], text: Task['title']) => void;
 }
 
-function TasksList({ tasks, isLoading, error, onTaskToggle }: Props) {
+function TasksList({
+  tasks,
+  isLoading,
+  error,
+  onTaskToggle,
+  onTaskTextUpdate,
+}: Props) {
   if (isLoading) {
     return <Loader />;
   }
@@ -22,7 +29,12 @@ function TasksList({ tasks, isLoading, error, onTaskToggle }: Props) {
   return (
     <ul className={styles.list}>
       {tasks.map(task => (
-        <TaskItem key={task.id} task={task} onTaskToggle={onTaskToggle} />
+        <TaskItem
+          key={task.id}
+          task={task}
+          onTaskToggle={onTaskToggle}
+          onTaskTextUpdate={onTaskTextUpdate}
+        />
       ))}
     </ul>
   );

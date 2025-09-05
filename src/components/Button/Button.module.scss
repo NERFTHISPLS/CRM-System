@@ -54,3 +54,17 @@
     outline: 1px solid constants.$color-red-dark;
   }
 }
+
+.success {
+  background-color: constants.$color-green;
+  color: constants.$color-white;
+
+  &:hover {
+    background-color: constants.$color-green-dark;
+  }
+
+  &:focus,
+  &:active {
+    outline: 1px solid constants.$color-green-dark;
+  }
+}
