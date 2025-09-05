@@ -10,6 +10,8 @@ import styles from './TaskItem.module.scss';
 import SaveCancelButtons from '../SaveCancelButtons/SaveCancelButtons';
 import TextInput from '../TextInput/TextInput';
 import { removeTask as removeTaskApi } from '../../api/tasks/removeTask';
+import { validateTaskText } from '../../utils/validators';
+import { ERROR_TASK_TEXT_LENGTH } from '../../utils/errors';
 
 interface Props {
   task: Task;
@@ -47,6 +49,10 @@ function TaskItem({ task, refetchTasks }: Props) {
     setIsLoading(false);
 
     try {
+      if (!validateTaskText(taskTextEdit)) {
+        throw new Error(ERROR_TASK_TEXT_LENGTH);
+      }
+
       setIsLoading(true);
       await updateTaskTitleApi(task.id, taskTextEdit);
       await refetchTasks();
