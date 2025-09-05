@@ -6,7 +6,7 @@ import { validateTaskText } from '../../utils/validators';
 import { ERROR_TASK_TEXT_LENGTH } from '../../utils/errors';
 import { createTask as createTaskApi } from '../../api/tasks/createTask';
 import type { Task } from '../../types/task';
-import { formatError } from '../../utils/helpers';
+import { handleError } from '../../utils/helpers';
 import TextInput from '../TextInput/TextInput';
 
 interface Props {
@@ -36,11 +36,7 @@ function NewTaskForm({ onTaskCreation }: Props) {
       setTaskText('');
       setError('');
     } catch (err) {
-      console.error(err);
-
-      if (err instanceof Error) {
-        setError(formatError(err.message));
-      }
+      handleError(err, setError);
     } finally {
       setIsLoading(false);
     }

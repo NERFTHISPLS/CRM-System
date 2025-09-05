@@ -9,6 +9,7 @@ interface Props {
   error: string;
   onTaskToggle: (taskId: Task['id'], isDone: Task['isDone']) => void;
   onTaskTextUpdate: (taskId: Task['id'], text: Task['title']) => void;
+  onTaskRemove: (taskId: Task['id']) => void;
 }
 
 function TasksList({
@@ -17,6 +18,7 @@ function TasksList({
   error,
   onTaskToggle,
   onTaskTextUpdate,
+  onTaskRemove,
 }: Props) {
   if (isLoading) {
     return <Loader />;
@@ -34,6 +36,7 @@ function TasksList({
           task={task}
           onTaskToggle={onTaskToggle}
           onTaskTextUpdate={onTaskTextUpdate}
+          onTaskRemove={onTaskRemove}
         />
       ))}
     </ul>

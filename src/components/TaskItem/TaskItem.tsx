@@ -2,21 +2,28 @@ import { useEffect, useState } from 'react';
 import { toggleTask as toggleTaskApi } from '../../api/tasks/toggleTask';
 import { updateTaskTitle as updateTaskTitleApi } from '../../api/tasks/updateTaskTitle';
 import type { Task } from '../../types/task';
-import { formatError } from '../../utils/helpers';
+import { handleError } from '../../utils/helpers';
 import Checkbox from '../Checkbox/Checkbox';
 import EditButton from '../EditButton/EditButton';
 import RemoveButton from '../RemoveButton/RemoveButton';
 import styles from './TaskItem.module.scss';
 import SaveCancelButtons from '../SaveCancelButtons/SaveCancelButtons';
 import TextInput from '../TextInput/TextInput';
+import { removeTask as removeTaskApi } from '../../api/tasks/removeTask';
 
 interface Props {
   task: Task;
   onTaskToggle: (taskId: Task['id'], isDone: Task['isDone']) => void;
   onTaskTextUpdate: (taskId: Task['id'], text: Task['title']) => void;
+  onTaskRemove: (taskId: Task['id']) => void;
 }
 
-function TaskItem({ task, onTaskToggle, onTaskTextUpdate }: Props) {
+function TaskItem({
+  task,
+  onTaskToggle,
+  onTaskTextUpdate,
+  onTaskRemove,
+}: Props) {
   const [taskTextEdit, setTaskTextEdit] = useState('');
   const [isEditSession, setIsEditSession] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -36,11 +43,7 @@ function TaskItem({ task, onTaskToggle, onTaskTextUpdate }: Props) {
       onTaskToggle(task.id, checked);
       setError('');
     } catch (err) {
-      console.error(err);
-
-      if (err instanceof Error) {
-        setError(formatError(err.message));
-      }
+      handleError(err, setError);
     } finally {
       setIsLoading(false);
     }
@@ -52,18 +55,30 @@ function TaskItem({ task, onTaskToggle, onTaskTextUpdate }: Props) {
 
     try {
       setIsLoading(true);
-      const updatedTask = await updateTaskTitleApi(task.id, taskTextEdit);
-      onTaskTextUpdate(updatedTask.id, updatedTask.title);
+      await updateTaskTitleApi(task.id, taskTextEdit);
+      onTaskTextUpdate(task.id, taskTextEdit);
       setError('');
     } catch (err) {
-      console.error(err);
-
-      if (err instanceof Error) {
-        setError(formatError(err.message));
-      }
+      handleError(err, setError);
     } finally {
       setIsLoading(false);
       setIsEditSession(false);
+    }
+  }
+
+  async function handleRemoveTask(): Promise<void> {
+    setError('');
+    setIsLoading(false);
+
+    try {
+      setIsLoading(true);
+      await removeTaskApi(task.id);
+      onTaskRemove(task.id);
+      setError('');
+    } catch (err) {
+      handleError(err, setError);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -100,7 +115,7 @@ function TaskItem({ task, onTaskToggle, onTaskTextUpdate }: Props) {
           />
         )}
 
-        <RemoveButton disabled={isLoading} />
+        <RemoveButton disabled={isLoading} onClick={handleRemoveTask} />
       </div>
     </li>
   );

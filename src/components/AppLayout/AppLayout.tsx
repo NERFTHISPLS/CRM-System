@@ -39,6 +39,10 @@ function AppLayout() {
     );
   }
 
+  function handleTaskRemove(targetTaskId: Task['id']): void {
+    setTasks(prev => prev.filter(task => task.id !== targetTaskId));
+  }
+
   return (
     <section className={styles.todoList}>
       <NewTaskForm onTaskCreation={handleNewTask} />
@@ -48,6 +52,7 @@ function AppLayout() {
         error={error}
         onTaskToggle={handleTaskToggle}
         onTaskTextUpdate={handleTaskTextUpdate}
+        onTaskRemove={handleTaskRemove}
       />
     </section>
   );

@@ -7,11 +7,12 @@ const classes = combineClassNames('material-symbols-outlined', styles.icon);
 
 interface Props {
   disabled?: boolean;
+  onClick: () => void;
 }
 
-function RemoveButton({ disabled = false }: Props) {
+function RemoveButton({ disabled = false, onClick }: Props) {
   return (
-    <Button type="danger" disabled={disabled}>
+    <Button type="danger" disabled={disabled} onClick={onClick}>
       <span className={classes}>delete</span>
     </Button>
   );
