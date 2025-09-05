@@ -5,7 +5,7 @@
 .wrapper {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .checkbox {
@@ -54,6 +54,8 @@
 }
 
 .label {
+  white-space: normal;
+  word-break: break-word;
   cursor: pointer;
 }
 
