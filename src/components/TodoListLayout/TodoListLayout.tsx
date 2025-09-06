@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { useFetchTasks } from '../../hooks/useFetchTasks';
 import NewTaskForm from '../NewTaskForm/NewTaskForm';
 import TasksList from '../TasksList/TasksList';
-import styles from './AppLayout.module.scss';
+import styles from './TodoListLayout.module.scss';
 import type { TaskFilterValue } from '../../types/task';
 import TasksFilter from '../TasksFilter/TasksFilter';
 import Loader from '../Loader/Loader';
 
-function AppLayout() {
+function TodoListLayout() {
   const [filterValue, setFilterValue] = useState<TaskFilterValue>('all');
   const { tasks, countInfo, isLoading, error, refetch } =
     useFetchTasks(filterValue);
@@ -35,4 +35,4 @@ function AppLayout() {
   );
 }
 
-export default AppLayout;
+export default TodoListLayout;

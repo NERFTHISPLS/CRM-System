@@ -1,13 +1,7 @@
-import AppLayout from '../AppLayout/AppLayout';
-
-import styles from './App.module.scss';
+import TasksListPage from '../../pages/TasksListPage';
 
 function App() {
-  return (
-    <main className={styles.app}>
-      <AppLayout />
-    </main>
-  );
+  return <TasksListPage />;
 }
 
 export default App;
