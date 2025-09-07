@@ -4,8 +4,7 @@ import { combineClassNames, handleError } from '@utils/helpers';
 import Checkbox from '@components/ui/Checkbox/Checkbox';
 import styles from './TaskItem.module.scss';
 import TextInput from '@components/ui/TextInput/TextInput';
-import { isTaskTextValid } from '@utils/validators';
-import { ERROR_TASK_TEXT_LENGTH } from '@utils/errors';
+import { validateTaskText } from '@utils/validators';
 import type { Todo } from '@/types/task';
 import Button from '@/components/ui/Button/Button';
 
@@ -58,9 +57,7 @@ function TaskItem({ task, refetchTasks }: Props): JSX.Element {
     setError('');
 
     try {
-      if (!isTaskTextValid(taskTextEdit)) {
-        throw new Error(ERROR_TASK_TEXT_LENGTH);
-      }
+      validateTaskText(taskTextEdit);
 
       setIsLoading(true);
       await updateTask(task.id, { title: taskTextEdit });

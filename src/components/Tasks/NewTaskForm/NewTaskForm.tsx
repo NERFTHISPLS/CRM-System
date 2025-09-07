@@ -1,8 +1,7 @@
 import { useState, type FormEvent, type JSX } from 'react';
 import Button from '@components/ui/Button/Button';
 import styles from './NewTaskForm.module.scss';
-import { isTaskTextValid } from '@utils/validators';
-import { ERROR_TASK_TEXT_LENGTH } from '@utils/errors';
+import { validateTaskText } from '@utils/validators';
 import { createTask } from '@api/tasks';
 import { handleError } from '@utils/helpers';
 import TextInput from '@components/ui/TextInput/TextInput';
@@ -19,14 +18,10 @@ function NewTaskForm({ refetchTasks }: Props): JSX.Element {
   async function createNewTask(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
 
-    if (!isTaskTextValid(taskText)) {
-      setError(ERROR_TASK_TEXT_LENGTH);
-      return;
-    }
-
     setError('');
 
     try {
+      validateTaskText(taskText);
       setIsLoading(true);
       await createTask(taskText);
       await refetchTasks();
