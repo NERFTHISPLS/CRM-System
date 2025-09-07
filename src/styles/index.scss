@@ -7,12 +7,11 @@
 }
 
 html {
-  font-size: 62.5%;
   font-family: 'Roboto', sans-serif;
-  color: constants.$text-color-base;
+  color: constants.$color-grey-dark;
 }
 
 body {
   min-height: 100vh;
-  background-color: constants.$color-blue-light;
+  background-color: constants.$color-primary-light;
 }

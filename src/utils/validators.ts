@@ -1,6 +1,6 @@
 import { MAX_TASK_TEXT_LENGTH, MIN_TASK_TEXT_LENGTH } from './constants';
 
-export function validateTaskText(taskText: string): boolean {
+export function isTaskTextValid(taskText: string): boolean {
   const taskTextLength = taskText.trim().length;
 
   return (

@@ -1,0 +1,64 @@
+// styles were taken from
+// https://blog.logrocket.com/building-custom-checkbox-react/
+@use '@/styles/constants';
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.checkbox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  margin-right: 2rem;
+  border: 1px solid constants.$color-grey-light;
+  outline: none;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+
+    + div .label {
+      cursor: default;
+    }
+  }
+}
+
+.checked {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: constants.$color-primary;
+  position: relative;
+  border-color: constants.$color-primary;
+
+  &::before {
+    content: '\2714';
+    font-size: 1.3rem;
+    color: constants.$color-white;
+  }
+
+  & + div .label {
+    text-decoration: line-through;
+    color: constants.$color-grey-light;
+  }
+}
+
+.label {
+  white-space: normal;
+  word-break: break-word;
+  cursor: pointer;
+}
+
+.error {
+  color: constants.$color-danger;
+  font-size: 1.4rem;
+  font-weight: 700;
+}

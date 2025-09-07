@@ -1,26 +1,21 @@
 import type { MetaResponse } from './general';
 
-export interface Task {
+export interface Todo {
   id: number;
   title: string;
   created: string; // ISO date string
   isDone: boolean;
 }
 
-export interface TaskRequest {
-  title: string;
-  isDone: boolean;
-}
+export type GetTodoResponse = MetaResponse<Todo, TodoInfo>;
 
-export type GetTasksResponse = MetaResponse<Task, TaskStatusCount>;
+export type TodoInfo = Record<TodoFilterValue, number>;
 
-export type TaskStatusCount = Record<TaskFilterValue, number>;
+export type TodoRequest = Partial<Omit<Todo, 'id' | 'created'>>;
 
-export type TaskCreateRequest = Partial<Omit<Task, 'id' | 'created'>>;
-
-export interface TaskFilter {
+export interface TodoFilter {
   label: string;
-  value: TaskFilterValue;
+  value: TodoFilterValue;
 }
 
-export type TaskFilterValue = 'all' | 'completed' | 'inWork';
+export type TodoFilterValue = 'all' | 'completed' | 'inWork';
