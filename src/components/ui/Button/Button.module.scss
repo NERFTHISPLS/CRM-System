@@ -1,0 +1,65 @@
+@use '@/styles/constants';
+
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  outline: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  background: none;
+  border-radius: 7px;
+
+  transition: all 0.2s;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.small {
+  padding: 1rem;
+}
+
+.medium {
+  padding: 1rem 4rem;
+}
+
+.primary {
+  background-color: constants.$color-primary;
+  color: constants.$color-white;
+
+  &:hover {
+    background-color: constants.$color-primary-dark;
+  }
+
+  &:focus,
+  &:active {
+    outline: 1px solid constants.$color-primary-dark;
+  }
+}
+
+.danger {
+  background-color: constants.$color-danger;
+  color: constants.$color-white;
+
+  &:hover {
+    background-color: constants.$color-danger-dark;
+  }
+
+  &:focus,
+  &:active {
+    outline: 1px solid constants.$color-danger-dark;
+  }
+}
+
+.neutral {
+  background-color: constants.$color-white;
+  border: 1px solid constants.$color-grey-light;
+
+  &:focus,
+  &:active {
+    border-color: constants.$color-grey-dark;
+  }
+}
