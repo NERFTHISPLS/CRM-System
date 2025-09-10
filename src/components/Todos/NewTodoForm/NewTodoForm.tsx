@@ -8,6 +8,7 @@ import {
 } from '@/utils/constants';
 import {
   ERROR_EMPTY_TODO_TEXT,
+  ERROR_TODO_TEXT_ONLY_SPACES,
   ERROR_TODO_TEXT_TOO_LONG,
   ERROR_TODO_TEXT_TOO_SHORT,
 } from '@/utils/errors';
@@ -28,7 +29,7 @@ function NewTodoForm({ refetchTodos }: Props): JSX.Element {
   const createNewTodo: FormProps<FormField>['onFinish'] = async values => {
     try {
       setIsLoading(true);
-      await createTodo(values.todoTitle);
+      await createTodo(values.todoTitle.trim());
       await refetchTodos();
       form.resetFields();
       messageApi.success('Task was created successfully');
@@ -54,6 +55,10 @@ function NewTodoForm({ refetchTodos }: Props): JSX.Element {
             style={{ flex: 1 }}
             rules={[
               { required: true, message: ERROR_EMPTY_TODO_TEXT },
+              {
+                pattern: /^(?!\s*$).+/, // not space chars
+                message: ERROR_TODO_TEXT_ONLY_SPACES,
+              },
               {
                 min: MIN_TODO_TITLE_LENGTH,
                 message: ERROR_TODO_TEXT_TOO_SHORT,

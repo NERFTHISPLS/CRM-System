@@ -20,6 +20,7 @@ import {
 } from 'antd';
 import {
   ERROR_EMPTY_TODO_TEXT,
+  ERROR_TODO_TEXT_ONLY_SPACES,
   ERROR_TODO_TEXT_TOO_LONG,
   ERROR_TODO_TEXT_TOO_SHORT,
 } from '@/utils/errors';
@@ -76,7 +77,7 @@ function TodoItem({
 
     try {
       setIsLoading(true);
-      await updateTodo(todo.id, { title: todoTitle });
+      await updateTodo(todo.id, { title: todoTitle.trim() });
       await refetchTodos();
       onTodoSuccess('Task was updated successfully');
     } catch (err) {
@@ -115,6 +116,10 @@ function TodoItem({
               style={{ margin: 0, flex: 1 }}
               rules={[
                 { required: true, message: ERROR_EMPTY_TODO_TEXT },
+                {
+                  pattern: /^(?!\s*$).+/, // not space chars
+                  message: ERROR_TODO_TEXT_ONLY_SPACES,
+                },
                 {
                   min: MIN_TODO_TITLE_LENGTH,
                   message: ERROR_TODO_TEXT_TOO_SHORT,
