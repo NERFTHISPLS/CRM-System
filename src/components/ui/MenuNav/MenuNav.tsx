@@ -1,43 +1,50 @@
 import { Menu, type MenuProps } from 'antd';
 import type { Key, ReactNode } from 'react';
-import { Link } from 'react-router';
+import { NavLink, useLocation } from 'react-router';
 import { UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 
 type MenuItem = Required<MenuProps>['items'][number];
-
-function getMenuItem(key: Key, label: ReactNode, icon: ReactNode): MenuItem {
-  return {
-    key,
-    label,
-    icon,
-  };
+interface MenuItemConfig {
+  key: Key;
+  label: ReactNode;
+  icon: ReactNode;
+  path: string;
 }
 
-const menuItems: MenuItem[] = [
-  getMenuItem(
-    'todo-list',
-    'Todo List',
-    <Link to="/">
-      <UnorderedListOutlined />
-    </Link>
-  ),
-
-  getMenuItem(
-    'user-profile',
-    'Profile',
-    <Link to="/user-profile">
-      <UserOutlined />
-    </Link>
-  ),
+const menuConfig: MenuItemConfig[] = [
+  {
+    key: 'todo-list',
+    label: 'Todo List',
+    icon: <UnorderedListOutlined />,
+    path: '/todo-list',
+  },
+  {
+    key: 'user-profile',
+    label: 'Profile',
+    icon: <UserOutlined />,
+    path: '/user-profile',
+  },
 ];
 
+const menuItems: MenuItem[] = menuConfig.map(config => ({
+  key: config.key,
+  label: <NavLink to={config.path}>{config.label}</NavLink>,
+  icon: config.icon,
+}));
+
 function MenuNav() {
+  const location = useLocation();
+
+  const activeKey =
+    menuConfig.find(item => location.pathname === item.path)?.key ||
+    'todo-list';
+
   return (
     <Menu
       items={menuItems}
       theme="dark"
       mode="inline"
-      defaultSelectedKeys={['todo-list']}
+      defaultSelectedKeys={[String(activeKey)]}
     />
   );
 }
