@@ -1,4 +1,4 @@
-import type { TodoFilterValue, TodoInfo } from '@/types/task';
+import type { TodoFilterValue, TodoInfo } from '@/types/todo';
 import type { JSX } from 'react';
 import { Tabs, type TabsProps } from 'antd';
 
@@ -18,7 +18,7 @@ interface Props {
   onSelected: (selected: TodoFilterValue) => void;
 }
 
-function TasksFilter({ countInfo, onSelected }: Props): JSX.Element | null {
+function TodosFilter({ countInfo, onSelected }: Props): JSX.Element | null {
   if (!countInfo) {
     return null;
   }
@@ -40,4 +40,4 @@ function TasksFilter({ countInfo, onSelected }: Props): JSX.Element | null {
   );
 }
 
-export default TasksFilter;
+export default TodosFilter;

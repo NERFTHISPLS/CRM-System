@@ -4,30 +4,30 @@ import type {
   TodoFilterValue,
   TodoInfo,
   TodoRequest,
-} from '@/types/task';
+} from '@/types/todo';
 import axios from 'axios';
 
 const apiClient = axios.create({ baseURL: 'https://easydev.club/api/v1' });
 
-export async function getTasks(
-  taskFilterValue: TodoFilterValue = 'all'
+export async function getTodos(
+  todoFilterValue: TodoFilterValue = 'all'
 ): Promise<MetaResponse<Todo, TodoInfo>> {
   const res = await apiClient.get<MetaResponse<Todo, TodoInfo>>('/todos', {
-    params: { filter: taskFilterValue },
+    params: { filter: todoFilterValue },
   });
 
   return res.data;
 }
 
-export async function createTask(taskText: string): Promise<Todo> {
+export async function createTodo(todoTitle: string): Promise<Todo> {
   const res = await apiClient.post<Todo>('/todos', {
-    title: taskText,
+    title: todoTitle,
   });
 
   return res.data;
 }
 
-export async function updateTask(
+export async function updateTodo(
   id: Todo['id'],
   fieldsToUpdate: TodoRequest
 ): Promise<Todo> {
@@ -36,6 +36,6 @@ export async function updateTask(
   return res.data;
 }
 
-export async function removeTask(id: Todo['id']): Promise<void> {
+export async function removeTodo(id: Todo['id']): Promise<void> {
   await apiClient.delete(`todos/${id}`);
 }

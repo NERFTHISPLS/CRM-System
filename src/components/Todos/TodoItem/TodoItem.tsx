@@ -1,8 +1,8 @@
 import { useState, type JSX } from 'react';
-import { removeTask, updateTask } from '@api/tasks';
+import { removeTodo, updateTodo } from '@/api/todo';
 import { getErrorMessage } from '@utils/helpers';
-import styles from './TaskItem.module.scss';
-import type { Todo } from '@/types/task';
+import styles from './TodoItem.module.scss';
+import type { Todo } from '@/types/todo';
 import {
   EditOutlined,
   DeleteOutlined,
@@ -19,28 +19,31 @@ import {
   type FormProps,
 } from 'antd';
 import {
-  ERROR_EMPTY_TASK_TEXT,
-  ERROR_TASK_TEXT_TOO_LONG,
-  ERROR_TASK_TEXT_TOO_SHORT,
+  ERROR_EMPTY_TODO_TEXT,
+  ERROR_TODO_TEXT_TOO_LONG,
+  ERROR_TODO_TEXT_TOO_SHORT,
 } from '@/utils/errors';
-import { MAX_TASK_TEXT_LENGTH, MIN_TASK_TEXT_LENGTH } from '@/utils/constants';
+import {
+  MAX_TODO_TITLE_LENGTH,
+  MIN_TODO_TITLE_LENGTH,
+} from '@/utils/constants';
 
 interface FormField {
-  taskText: string;
+  todoTitle: string;
 }
 
 interface Props {
-  task: Todo;
-  refetchTasks: () => Promise<void>;
-  onTaskSuccess: (message: string) => void;
-  onTaskFail: (message: string) => void;
+  todo: Todo;
+  refetchTodos: () => Promise<void>;
+  onTodoSuccess: (message: string) => void;
+  onTodoFail: (message: string) => void;
 }
 
-function TaskItem({
-  task,
-  refetchTasks,
-  onTaskSuccess,
-  onTaskFail,
+function TodoItem({
+  todo,
+  refetchTodos,
+  onTodoSuccess,
+  onTodoFail,
 }: Props): JSX.Element {
   const [form] = Form.useForm();
   const [isEditSession, setIsEditSession] = useState<boolean>(false);
@@ -48,77 +51,77 @@ function TaskItem({
 
   function handleStartEditSession(): void {
     setIsEditSession(true);
-    form.setFieldValue('taskText', task.title);
+    form.setFieldValue('todoTitle', todo.title);
   }
 
-  async function handleTaskToggle(): Promise<void> {
+  async function handleTodoToggle(): Promise<void> {
     try {
       setIsLoading(true);
-      await updateTask(task.id, { isDone: !task.isDone });
-      await refetchTasks();
+      await updateTodo(todo.id, { isDone: !todo.isDone });
+      await refetchTodos();
     } catch (err) {
-      onTaskFail(getErrorMessage(err));
+      onTodoFail(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
   }
 
-  const handleEditTaskText: FormProps<FormField>['onFinish'] = async ({
-    taskText,
+  const handleEditTodoText: FormProps<FormField>['onFinish'] = async ({
+    todoTitle,
   }) => {
-    if (taskText === task.title) {
+    if (todoTitle === todo.title) {
       setIsEditSession(false);
       return;
     }
 
     try {
       setIsLoading(true);
-      await updateTask(task.id, { title: taskText });
-      await refetchTasks();
-      onTaskSuccess('Task was updated successfully');
+      await updateTodo(todo.id, { title: todoTitle });
+      await refetchTodos();
+      onTodoSuccess('Task was updated successfully');
     } catch (err) {
-      onTaskFail(getErrorMessage(err));
+      onTodoFail(getErrorMessage(err));
     } finally {
       setIsLoading(false);
       setIsEditSession(false);
     }
   };
 
-  async function handleRemoveTask(): Promise<void> {
+  async function handleRemoveTodo(): Promise<void> {
     try {
       setIsLoading(true);
-      await removeTask(task.id);
-      await refetchTasks();
-      onTaskSuccess('Task was deleted successfully');
+      await removeTodo(todo.id);
+      await refetchTodos();
+      onTodoSuccess('Task was deleted successfully');
     } catch (err) {
-      onTaskFail(getErrorMessage(err));
+      onTodoFail(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
   }
 
   return (
-    <div className={styles.task}>
+    <div className={styles.todo}>
       {isEditSession ? (
         <Form
           variant="underlined"
           form={form}
           autoComplete="off"
-          onFinish={handleEditTaskText}
+          onFinish={handleEditTodoText}
         >
           <Flex gap="middle" align="center">
             <Form.Item<FormField>
-              name="taskText"
+              name="todoTitle"
               style={{ margin: 0, flex: 1 }}
               rules={[
-                { required: true, message: ERROR_EMPTY_TASK_TEXT },
+                { required: true, message: ERROR_EMPTY_TODO_TEXT },
                 {
-                  min: MIN_TASK_TEXT_LENGTH,
-                  message: ERROR_TASK_TEXT_TOO_SHORT,
+                  min: MIN_TODO_TITLE_LENGTH,
+                  message: ERROR_TODO_TEXT_TOO_SHORT,
                 },
                 {
-                  max: MAX_TASK_TEXT_LENGTH,
-                  message: ERROR_TASK_TEXT_TOO_LONG,
+                  max: MAX_TODO_TITLE_LENGTH,
+                  message: ERROR_TODO_TEXT_TOO_LONG,
                 },
               ]}
             >
@@ -151,14 +154,14 @@ function TaskItem({
         <Flex align="center">
           <Checkbox
             style={{
-              textDecoration: task.isDone ? 'line-through' : 'none',
+              textDecoration: todo.isDone ? 'line-through' : 'none',
               flex: 1,
             }}
-            checked={task.isDone}
+            checked={todo.isDone}
             disabled={isLoading}
-            onChange={handleTaskToggle}
+            onChange={handleTodoToggle}
           >
-            {task.title}
+            {todo.title}
           </Checkbox>
 
           <Space>
@@ -175,7 +178,7 @@ function TaskItem({
               variant="filled"
               icon={<DeleteOutlined />}
               disabled={isLoading}
-              onClick={handleRemoveTask}
+              onClick={handleRemoveTodo}
             />
           </Space>
         </Flex>
@@ -184,4 +187,4 @@ function TaskItem({
   );
 }
 
-export default TaskItem;
+export default TodoItem;

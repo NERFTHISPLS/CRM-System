@@ -1,37 +1,37 @@
 import { useCallback, useEffect, useState, type JSX } from 'react';
-import styles from './TasksListPage.module.scss';
-import { getTasks } from '@api/tasks';
+import styles from './TodoListPage.module.scss';
+import { getTodos } from '@/api/todo';
 import { getErrorMessage } from '@utils/helpers';
-import NewTaskForm from '@/components/Tasks/NewTaskForm/NewTaskForm';
-import TasksFilter from '@/components/Tasks/TasksFilter/TasksFilter';
-import TasksList from '@/components/Tasks/TasksList/TasksList';
-import type { Todo, TodoFilterValue, TodoInfo } from '@/types/task';
+import NewTodoForm from '@/components/Todos/NewTodoForm/NewTodoForm';
+import TodosFilter from '@/components/Todos/TodosFilter/TodosFilter';
+import TodoList from '@/components/Todos/TodoList/TodoList';
+import type { Todo, TodoFilterValue, TodoInfo } from '@/types/todo';
 import { Alert, Flex, Spin } from 'antd';
 
-const REFETCH_TASKS_INTERVAL_MS = 5000;
+const REFETCH_TODOS_INTERVAL_MS = 5000;
 
-function TasksListPage(): JSX.Element {
+function TodoListPage(): JSX.Element {
   const [filterValue, setFilterValue] = useState<TodoFilterValue>('all');
-  const [tasks, setTasks] = useState<Todo[]>([]);
+  const [todos, setTodos] = useState<Todo[]>([]);
   const [countInfo, setCountInfo] = useState<TodoInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showLoader, setShowLoader] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
-  // On the initial render useEffect will run fetchTasks and fetchTasks will cause rerendering.
-  // Without useCallback fetchTasks will change its link in the memory, so useEffect will be called again.
+  // On the initial render useEffect will run fetchTodos and fetchTodos will cause rerendering.
+  // Without useCallback fetchTodos will change its link in the memory, so useEffect will be called again.
   // So we will end up in the infinite loop.
   // We use separate variable for this function, because it is used in several components below.
-  const fetchTasks = useCallback(
+  const fetchTodos = useCallback(
     async (isLoaderShown: boolean) => {
       setError('');
       setIsLoading(true);
       setShowLoader(isLoaderShown);
 
       try {
-        const { data, info } = await getTasks(filterValue);
+        const { data, info } = await getTodos(filterValue);
 
-        setTasks(data);
+        setTodos(data);
         setCountInfo(info);
       } catch (err) {
         setError(getErrorMessage(err));
@@ -44,15 +44,15 @@ function TasksListPage(): JSX.Element {
   );
 
   useEffect(() => {
-    fetchTasks(true);
+    fetchTodos(true);
 
     const intervalId = setInterval(
-      () => fetchTasks(false),
-      REFETCH_TASKS_INTERVAL_MS
+      () => fetchTodos(false),
+      REFETCH_TODOS_INTERVAL_MS
     );
 
     return () => clearInterval(intervalId);
-  }, [fetchTasks]);
+  }, [fetchTodos]);
 
   if (error) {
     return <Alert message="Error" description={error} type="error" showIcon />;
@@ -60,18 +60,18 @@ function TasksListPage(): JSX.Element {
 
   return (
     <Flex className={styles.container} vertical>
-      <NewTaskForm refetchTasks={() => fetchTasks(true)} />
+      <NewTodoForm refetchTodos={() => fetchTodos(true)} />
 
-      <TasksFilter
+      <TodosFilter
         countInfo={countInfo}
         onSelected={value => setFilterValue(value)}
       />
 
       <Spin spinning={showLoader && isLoading} tip="Loading your tasks...">
-        <TasksList tasks={tasks} refetchTasks={() => fetchTasks(false)} />
+        <TodoList todos={todos} refetchTodos={() => fetchTodos(false)} />
       </Spin>
     </Flex>
   );
 }
 
-export default TasksListPage;
+export default TodoListPage;

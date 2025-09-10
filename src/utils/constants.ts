@@ -1,2 +1,2 @@
-export const MIN_TASK_TEXT_LENGTH = 2;
-export const MAX_TASK_TEXT_LENGTH = 64;
+export const MIN_TODO_TITLE_LENGTH = 2;
+export const MAX_TODO_TITLE_LENGTH = 64;
