@@ -8,6 +8,8 @@ import TasksList from '@/components/Tasks/TasksList/TasksList';
 import type { Todo, TodoFilterValue, TodoInfo } from '@/types/task';
 import { Alert, Flex, Spin } from 'antd';
 
+const REFETCH_TASKS_INTERVAL_MS = 5000;
+
 function TasksListPage(): JSX.Element {
   const [filterValue, setFilterValue] = useState<TodoFilterValue>('all');
   const [tasks, setTasks] = useState<Todo[]>([]);
@@ -43,6 +45,13 @@ function TasksListPage(): JSX.Element {
 
   useEffect(() => {
     fetchTasks(true);
+
+    const intervalId = setInterval(
+      () => fetchTasks(false),
+      REFETCH_TASKS_INTERVAL_MS
+    );
+
+    return () => clearInterval(intervalId);
   }, [fetchTasks]);
 
   if (error) {
