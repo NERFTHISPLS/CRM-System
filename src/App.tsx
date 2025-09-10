@@ -1,7 +1,8 @@
-import TasksListPage from './pages/TasksListPage';
+import type { JSX } from 'react';
+import AppLayout from './components/AppLayout/AppLayout';
 
-function App() {
-  return <TasksListPage />;
+function App(): JSX.Element {
+  return <AppLayout />;
 }
 
 export default App;

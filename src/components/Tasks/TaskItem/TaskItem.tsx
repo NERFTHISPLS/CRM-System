@@ -1,149 +1,186 @@
-import { useState, type FormEvent, type JSX } from 'react';
+import { useState, type JSX } from 'react';
 import { removeTask, updateTask } from '@api/tasks';
-import { combineClassNames, handleError } from '@utils/helpers';
-import Checkbox from '@components/ui/Checkbox/Checkbox';
+import { getErrorMessage } from '@utils/helpers';
 import styles from './TaskItem.module.scss';
-import TextInput from '@components/ui/TextInput/TextInput';
-import { validateTaskText } from '@utils/validators';
 import type { Todo } from '@/types/task';
-import Button from '@/components/ui/Button/Button';
+import {
+  EditOutlined,
+  DeleteOutlined,
+  CheckOutlined,
+  CloseOutlined,
+} from '@ant-design/icons';
+import {
+  Button,
+  Checkbox,
+  Flex,
+  Form,
+  Input,
+  Space,
+  type FormProps,
+} from 'antd';
+import {
+  ERROR_EMPTY_TASK_TEXT,
+  ERROR_TASK_TEXT_TOO_LONG,
+  ERROR_TASK_TEXT_TOO_SHORT,
+} from '@/utils/errors';
+import { MAX_TASK_TEXT_LENGTH, MIN_TASK_TEXT_LENGTH } from '@/utils/constants';
+
+interface FormField {
+  taskText: string;
+}
 
 interface Props {
   task: Todo;
   refetchTasks: () => Promise<void>;
+  onTaskSuccess: (message: string) => void;
+  onTaskFail: (message: string) => void;
 }
 
-const iconClassNames = combineClassNames(
-  'material-symbols-outlined',
-  styles.icon
-);
-
-function TaskItem({ task, refetchTasks }: Props): JSX.Element {
-  const [taskTextEdit, setTaskTextEdit] = useState<string>('');
+function TaskItem({
+  task,
+  refetchTasks,
+  onTaskSuccess,
+  onTaskFail,
+}: Props): JSX.Element {
+  const [form] = Form.useForm();
   const [isEditSession, setIsEditSession] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
 
   function handleStartEditSession(): void {
     setIsEditSession(true);
-    setTaskTextEdit(task.title);
+    form.setFieldValue('taskText', task.title);
   }
 
   async function handleTaskToggle(): Promise<void> {
-    setError('');
-
     try {
       setIsLoading(true);
       await updateTask(task.id, { isDone: !task.isDone });
       await refetchTasks();
-      setError('');
     } catch (err) {
-      handleError(err, setError);
+      onTaskFail(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
   }
 
-  async function handleEditTaskText(
-    e: FormEvent<HTMLFormElement>
-  ): Promise<void> {
-    e.preventDefault();
-
-    if (taskTextEdit === task.title) {
-      handleEditCancel();
+  const handleEditTaskText: FormProps<FormField>['onFinish'] = async ({
+    taskText,
+  }) => {
+    if (taskText === task.title) {
+      setIsEditSession(false);
       return;
     }
 
-    setError('');
-
     try {
-      validateTaskText(taskTextEdit);
-
       setIsLoading(true);
-      await updateTask(task.id, { title: taskTextEdit });
+      await updateTask(task.id, { title: taskText });
       await refetchTasks();
-      setError('');
+      onTaskSuccess('Task was updated successfully');
     } catch (err) {
-      handleError(err, setError);
+      onTaskFail(getErrorMessage(err));
     } finally {
       setIsLoading(false);
       setIsEditSession(false);
     }
-  }
-
-  function handleEditCancel(): void {
-    setError('');
-    setIsEditSession(false);
-  }
+  };
 
   async function handleRemoveTask(): Promise<void> {
-    setError('');
-
     try {
       setIsLoading(true);
       await removeTask(task.id);
       await refetchTasks();
-      setError('');
+      onTaskSuccess('Task was deleted successfully');
     } catch (err) {
-      handleError(err, setError);
+      onTaskFail(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
   }
 
   return (
-    <li className={styles.task}>
+    <div className={styles.task}>
       {isEditSession ? (
-        <form className={styles.editForm} onSubmit={handleEditTaskText}>
-          <TextInput
-            className={styles.editInput}
-            value={taskTextEdit}
-            onChange={e => setTaskTextEdit(e.target.value)}
-          />
+        <Form
+          variant="underlined"
+          form={form}
+          autoComplete="off"
+          onFinish={handleEditTaskText}
+        >
+          <Flex gap="middle" align="center">
+            <Form.Item<FormField>
+              name="taskText"
+              style={{ margin: 0, flex: 1 }}
+              rules={[
+                { required: true, message: ERROR_EMPTY_TASK_TEXT },
+                {
+                  min: MIN_TASK_TEXT_LENGTH,
+                  message: ERROR_TASK_TEXT_TOO_SHORT,
+                },
+                {
+                  max: MAX_TASK_TEXT_LENGTH,
+                  message: ERROR_TASK_TEXT_TOO_LONG,
+                },
+              ]}
+            >
+              <Input
+                placeholder="Input updated task text..."
+                disabled={isLoading}
+                autoFocus
+              />
+            </Form.Item>
 
-          <div className={styles.control}>
-            <div className={styles.saveCancelButtons}>
-              <Button type="submit" disabled={isLoading}>
-                <span className={iconClassNames}>check</span>
-              </Button>
+            <Space>
+              <Button
+                htmlType="submit"
+                type="primary"
+                disabled={isLoading}
+                icon={<CheckOutlined />}
+              />
 
               <Button
-                type="reset"
-                variant="neutral"
+                htmlType="button"
+                color="danger"
                 disabled={isLoading}
-                onClick={handleEditCancel}
-              >
-                <span className={iconClassNames}>close</span>
-              </Button>
-            </div>
-          </div>
-        </form>
+                onClick={() => setIsEditSession(false)}
+                icon={<CloseOutlined />}
+              />
+            </Space>
+          </Flex>
+        </Form>
       ) : (
-        <>
+        <Flex align="center">
           <Checkbox
-            label={task.title}
+            style={{
+              textDecoration: task.isDone ? 'line-through' : 'none',
+              flex: 1,
+            }}
             checked={task.isDone}
-            onChange={handleTaskToggle}
-            errorMessage={error}
             disabled={isLoading}
-          />
+            onChange={handleTaskToggle}
+          >
+            {task.title}
+          </Checkbox>
 
-          <div className={styles.control}>
-            <Button disabled={isLoading} onClick={handleStartEditSession}>
-              <span className={iconClassNames}>edit_square</span>
-            </Button>
+          <Space>
+            <Button
+              color="primary"
+              variant="filled"
+              icon={<EditOutlined />}
+              disabled={isLoading}
+              onClick={handleStartEditSession}
+            />
 
             <Button
-              variant="danger"
+              color="danger"
+              variant="filled"
+              icon={<DeleteOutlined />}
               disabled={isLoading}
               onClick={handleRemoveTask}
-            >
-              <span className={iconClassNames}>delete</span>
-            </Button>
-          </div>
-        </>
+            />
+          </Space>
+        </Flex>
       )}
-    </li>
+    </div>
   );
 }
 

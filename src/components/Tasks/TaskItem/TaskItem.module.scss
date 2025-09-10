@@ -2,38 +2,8 @@
 
 .task {
   flex: 1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding: 0.5rem 1rem;
   background-color: constants.$color-white;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
   border-radius: 7px;
-}
-
-.control {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.editForm {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-.editInput {
-  margin-right: 1.5rem;
-}
-
-.saveCancelButtons {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.icon {
-  font-size: constants.$icon-size;
 }

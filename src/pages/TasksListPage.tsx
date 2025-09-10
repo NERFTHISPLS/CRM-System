@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState, type JSX } from 'react';
 import styles from './TasksListPage.module.scss';
 import { getTasks } from '@api/tasks';
-import { handleError } from '@utils/helpers';
-import Loader from '@/components/ui/Loader/Loader';
+import { getErrorMessage } from '@utils/helpers';
 import NewTaskForm from '@/components/Tasks/NewTaskForm/NewTaskForm';
 import TasksFilter from '@/components/Tasks/TasksFilter/TasksFilter';
 import TasksList from '@/components/Tasks/TasksList/TasksList';
 import type { Todo, TodoFilterValue, TodoInfo } from '@/types/task';
+import { Alert, Flex, Spin } from 'antd';
 
 function TasksListPage(): JSX.Element {
   const [filterValue, setFilterValue] = useState<TodoFilterValue>('all');
@@ -32,7 +32,7 @@ function TasksListPage(): JSX.Element {
         setTasks(data);
         setCountInfo(info);
       } catch (err) {
-        handleError(err, setError);
+        setError(getErrorMessage(err));
       } finally {
         setIsLoading(false);
         setShowLoader(false);
@@ -45,26 +45,23 @@ function TasksListPage(): JSX.Element {
     fetchTasks(true);
   }, [fetchTasks]);
 
+  if (error) {
+    return <Alert message="Error" description={error} type="error" showIcon />;
+  }
+
   return (
-    <main className={styles.main}>
-      <section className={styles.todoList}>
-        <NewTaskForm refetchTasks={() => fetchTasks(true)} />
+    <Flex className={styles.container} vertical>
+      <NewTaskForm refetchTasks={() => fetchTasks(true)} />
 
-        <TasksFilter
-          countInfo={countInfo}
-          selected={filterValue}
-          onSelected={value => setFilterValue(value)}
-        />
+      <TasksFilter
+        countInfo={countInfo}
+        onSelected={value => setFilterValue(value)}
+      />
 
-        {showLoader && isLoading ? (
-          <Loader />
-        ) : error ? (
-          <p className={styles.error}>{error}</p>
-        ) : (
-          <TasksList tasks={tasks} refetchTasks={() => fetchTasks(false)} />
-        )}
-      </section>
-    </main>
+      <Spin spinning={showLoader && isLoading} tip="Loading your tasks...">
+        <TasksList tasks={tasks} refetchTasks={() => fetchTasks(false)} />
+      </Spin>
+    </Flex>
   );
 }
 

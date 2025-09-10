@@ -1,7 +1,7 @@
 import type { Todo } from '@/types/task';
 import TaskItem from '../TaskItem/TaskItem';
-import styles from './TasksList.module.scss';
 import type { JSX } from 'react';
+import { List, message } from 'antd';
 
 interface Props {
   tasks: Todo[];
@@ -9,12 +9,38 @@ interface Props {
 }
 
 function TasksList({ tasks, refetchTasks }: Props): JSX.Element {
+  // We use messageApi here instead of the TaskItem because of the task deletion.
+  // When a task is deleted, the TaskItem component is removed from the DOM before
+  // the success message has a chance to be displayed.
+  const [messageApi, contextHolder] = message.useMessage();
+
+  function handleTaskSuccess(message: string): void {
+    messageApi.success(message);
+  }
+
+  function handleTaskFail(message: string): void {
+    messageApi.error(message);
+  }
+
   return (
-    <ul className={styles.list}>
-      {tasks.map(task => (
-        <TaskItem key={task.id} task={task} refetchTasks={refetchTasks} />
-      ))}
-    </ul>
+    <>
+      {contextHolder}
+      <List
+        size="small"
+        dataSource={tasks}
+        split={false}
+        renderItem={task => (
+          <List.Item key={task.id}>
+            <TaskItem
+              task={task}
+              refetchTasks={refetchTasks}
+              onTaskSuccess={handleTaskSuccess}
+              onTaskFail={handleTaskFail}
+            />
+          </List.Item>
+        )}
+      />
+    </>
   );
 }
 
