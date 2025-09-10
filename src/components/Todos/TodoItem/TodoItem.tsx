@@ -70,14 +70,16 @@ function TodoItem({
   const handleEditTodoText: FormProps<FormField>['onFinish'] = async ({
     todoTitle,
   }) => {
-    if (todoTitle === todo.title) {
+    const todoTitleTrimmed = todoTitle.trim();
+
+    if (todoTitleTrimmed === todo.title) {
       setIsEditSession(false);
       return;
     }
 
     try {
       setIsLoading(true);
-      await updateTodo(todo.id, { title: todoTitle.trim() });
+      await updateTodo(todo.id, { title: todoTitleTrimmed });
       await refetchTodos();
       onTodoSuccess('Task was updated successfully');
     } catch (err) {
