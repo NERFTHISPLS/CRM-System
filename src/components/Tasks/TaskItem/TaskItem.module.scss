@@ -1,9 +1,7 @@
-@use '@/styles/constants';
-
 .task {
   flex: 1;
   padding: 0.5rem 1rem;
-  background-color: constants.$color-white;
+  background-color: #fff;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
   border-radius: 7px;
 }
