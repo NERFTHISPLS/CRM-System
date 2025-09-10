@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import AppLayout from './components/AppLayout/AppLayout';
+import AppLayout from './components/ui/AppLayout/AppLayout';
 
 function App(): JSX.Element {
   return <AppLayout />;
