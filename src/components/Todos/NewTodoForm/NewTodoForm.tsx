@@ -1,4 +1,4 @@
-import { useState, type JSX } from 'react';
+import { memo, useState, type JSX } from 'react';
 import { createTodo } from '@/api/todo';
 import { getErrorMessage } from '@utils/helpers';
 import { Button, Form, Input, message, Space, type FormProps } from 'antd';
@@ -86,4 +86,4 @@ function NewTodoForm({ refetchTodos }: Props): JSX.Element {
   );
 }
 
-export default NewTodoForm;
+export default memo(NewTodoForm);

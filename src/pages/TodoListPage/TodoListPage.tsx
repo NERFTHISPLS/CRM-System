@@ -43,6 +43,10 @@ function TodoListPage(): JSX.Element {
     [filterValue]
   );
 
+  const fetchTodosShowingLoader = useCallback(async () => {
+    fetchTodos(true);
+  }, [fetchTodos]);
+
   useEffect(() => {
     fetchTodos(true);
 
@@ -60,7 +64,7 @@ function TodoListPage(): JSX.Element {
 
   return (
     <Flex className={styles.container} vertical>
-      <NewTodoForm refetchTodos={() => fetchTodos(true)} />
+      <NewTodoForm refetchTodos={fetchTodosShowingLoader} />
 
       <TodosFilter
         countInfo={countInfo}

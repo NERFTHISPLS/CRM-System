@@ -8,6 +8,8 @@ interface Props {
   refetchTodos: () => Promise<void>;
 }
 
+// there is no point to memoize this component
+// because of the todos prop which always updates by fetching the data from the server
 function TodoList({ todos, refetchTodos }: Props): JSX.Element {
   // We use messageApi here instead of the TodoItem because of the todo deletion.
   // When a todo is deleted, the TodoItem component is removed from the DOM before
