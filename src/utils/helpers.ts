@@ -1,17 +1,11 @@
-export function combineClassNames(...classNames: string[]): string {
-  return classNames.join(' ');
-}
-
-export function handleError(
-  err: unknown,
-  handler: (errText: string) => void
-): void | never {
-  console.error(err);
-
+export function getErrorMessage(err: unknown): string {
   if (err instanceof Error) {
-    handler(err.message);
-    return;
+    return err.message;
   }
 
-  throw err;
+  if (typeof err === 'string') {
+    return err;
+  }
+
+  return 'Failed to create task';
 }
