@@ -18,16 +18,8 @@ import {
   Space,
   type FormProps,
 } from 'antd';
-import {
-  ERROR_EMPTY_TODO_TEXT,
-  ERROR_TODO_TEXT_ONLY_SPACES,
-  ERROR_TODO_TEXT_TOO_LONG,
-  ERROR_TODO_TEXT_TOO_SHORT,
-} from '@/utils/errors';
-import {
-  MAX_TODO_TITLE_LENGTH,
-  MIN_TODO_TITLE_LENGTH,
-} from '@/utils/constants';
+import { TODO_TITLE_INPUT_RULES } from '@/utils/constants';
+import type { MessageInstance } from 'antd/es/message/interface';
 
 interface FormField {
   todoTitle: string;
@@ -35,17 +27,11 @@ interface FormField {
 
 interface Props {
   todo: Todo;
+  messageApi: MessageInstance;
   refetchTodos: () => Promise<void>;
-  onTodoSuccess: (message: string) => void;
-  onTodoFail: (message: string) => void;
 }
 
-function TodoItem({
-  todo,
-  refetchTodos,
-  onTodoSuccess,
-  onTodoFail,
-}: Props): JSX.Element {
+function TodoItem({ todo, messageApi, refetchTodos }: Props): JSX.Element {
   const [form] = Form.useForm();
   const [isEditSession, setIsEditSession] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -61,7 +47,7 @@ function TodoItem({
       await updateTodo(todo.id, { isDone: !todo.isDone });
       await refetchTodos();
     } catch (err) {
-      onTodoFail(getErrorMessage(err));
+      messageApi.error(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -81,9 +67,9 @@ function TodoItem({
       setIsLoading(true);
       await updateTodo(todo.id, { title: todoTitleTrimmed });
       await refetchTodos();
-      onTodoSuccess('Task was updated successfully');
+      messageApi.success('Task was updated successfully');
     } catch (err) {
-      onTodoFail(getErrorMessage(err));
+      messageApi.error(getErrorMessage(err));
     } finally {
       setIsLoading(false);
       setIsEditSession(false);
@@ -95,9 +81,9 @@ function TodoItem({
       setIsLoading(true);
       await removeTodo(todo.id);
       await refetchTodos();
-      onTodoSuccess('Task was deleted successfully');
+      messageApi.success('Task was deleted successfully');
     } catch (err) {
-      onTodoFail(getErrorMessage(err));
+      messageApi.error(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -116,21 +102,7 @@ function TodoItem({
             <Form.Item<FormField>
               name="todoTitle"
               style={{ margin: 0, flex: 1 }}
-              rules={[
-                { required: true, message: ERROR_EMPTY_TODO_TEXT },
-                {
-                  pattern: /^(?!\s*$).+/, // not space chars
-                  message: ERROR_TODO_TEXT_ONLY_SPACES,
-                },
-                {
-                  min: MIN_TODO_TITLE_LENGTH,
-                  message: ERROR_TODO_TEXT_TOO_SHORT,
-                },
-                {
-                  max: MAX_TODO_TITLE_LENGTH,
-                  message: ERROR_TODO_TEXT_TOO_LONG,
-                },
-              ]}
+              rules={TODO_TITLE_INPUT_RULES}
             >
               <Input
                 placeholder="Input updated task text..."

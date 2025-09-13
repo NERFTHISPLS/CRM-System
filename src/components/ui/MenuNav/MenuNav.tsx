@@ -26,7 +26,7 @@ const menuConfig: MenuItemConfig[] = [
   },
 ];
 
-const menuItems: MenuItem[] = menuConfig.map(config => ({
+const menuItems: MenuItem[] = menuConfig.map((config) => ({
   key: config.key,
   label: <NavLink to={config.path}>{config.label}</NavLink>,
   icon: config.icon,
@@ -36,7 +36,7 @@ function MenuNav() {
   const location = useLocation();
 
   const activeKey =
-    menuConfig.find(item => location.pathname === item.path)?.key ||
+    menuConfig.find((item) => location.pathname === item.path)?.key ||
     'todo-list';
 
   return (

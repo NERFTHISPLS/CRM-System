@@ -23,7 +23,7 @@ function TodosFilter({ countInfo, onSelected }: Props): JSX.Element | null {
     return null;
   }
 
-  const tabItems: TabsProps['items'] = TAB_CONFIG.map(tab => ({
+  const tabItems: TabsProps['items'] = TAB_CONFIG.map((tab) => ({
     key: tab.key,
     label: (
       <>
@@ -35,7 +35,7 @@ function TodosFilter({ countInfo, onSelected }: Props): JSX.Element | null {
   return (
     <Tabs
       items={tabItems}
-      onChange={key => onSelected(key as TodoFilterValue)}
+      onChange={(key) => onSelected(key as TodoFilterValue)}
     />
   );
 }

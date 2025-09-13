@@ -68,7 +68,7 @@ function TodoListPage(): JSX.Element {
 
       <TodosFilter
         countInfo={countInfo}
-        onSelected={value => setFilterValue(value)}
+        onSelected={(value) => setFilterValue(value)}
       />
 
       <Spin spinning={showLoader && isLoading} tip="Loading your tasks...">

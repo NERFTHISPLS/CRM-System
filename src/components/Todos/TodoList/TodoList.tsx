@@ -16,14 +16,6 @@ function TodoList({ todos, refetchTodos }: Props): JSX.Element {
   // the success message has a chance to be displayed.
   const [messageApi, contextHolder] = message.useMessage();
 
-  function handleTodoSuccess(message: string): void {
-    messageApi.success(message);
-  }
-
-  function handleTodoFail(message: string): void {
-    messageApi.error(message);
-  }
-
   return (
     <>
       {contextHolder}
@@ -31,13 +23,12 @@ function TodoList({ todos, refetchTodos }: Props): JSX.Element {
         size="small"
         dataSource={todos}
         split={false}
-        renderItem={todo => (
+        renderItem={(todo) => (
           <List.Item key={todo.id}>
             <TodoItem
               todo={todo}
               refetchTodos={refetchTodos}
-              onTodoSuccess={handleTodoSuccess}
-              onTodoFail={handleTodoFail}
+              messageApi={messageApi}
             />
           </List.Item>
         )}

@@ -2,16 +2,7 @@ import { memo, useState, type JSX } from 'react';
 import { createTodo } from '@/api/todo';
 import { getErrorMessage } from '@utils/helpers';
 import { Button, Form, Input, message, Space, type FormProps } from 'antd';
-import {
-  MAX_TODO_TITLE_LENGTH,
-  MIN_TODO_TITLE_LENGTH,
-} from '@/utils/constants';
-import {
-  ERROR_EMPTY_TODO_TEXT,
-  ERROR_TODO_TEXT_ONLY_SPACES,
-  ERROR_TODO_TEXT_TOO_LONG,
-  ERROR_TODO_TEXT_TOO_SHORT,
-} from '@/utils/errors';
+import { TODO_TITLE_INPUT_RULES } from '@/utils/constants';
 
 interface FormField {
   todoTitle: string;
@@ -21,12 +12,12 @@ interface Props {
   refetchTodos: () => Promise<void>;
 }
 
-function NewTodoForm({ refetchTodos }: Props): JSX.Element {
+const NewTodoForm = memo<Props>(({ refetchTodos }): JSX.Element => {
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const createNewTodo: FormProps<FormField>['onFinish'] = async values => {
+  const createNewTodo: FormProps<FormField>['onFinish'] = async (values) => {
     try {
       setIsLoading(true);
       await createTodo(values.todoTitle.trim());
@@ -53,21 +44,7 @@ function NewTodoForm({ refetchTodos }: Props): JSX.Element {
           <Form.Item<FormField>
             name="todoTitle"
             style={{ flex: 1 }}
-            rules={[
-              { required: true, message: ERROR_EMPTY_TODO_TEXT },
-              {
-                pattern: /^(?!\s*$).+/, // not space chars
-                message: ERROR_TODO_TEXT_ONLY_SPACES,
-              },
-              {
-                min: MIN_TODO_TITLE_LENGTH,
-                message: ERROR_TODO_TEXT_TOO_SHORT,
-              },
-              {
-                max: MAX_TODO_TITLE_LENGTH,
-                message: ERROR_TODO_TEXT_TOO_LONG,
-              },
-            ]}
+            rules={TODO_TITLE_INPUT_RULES}
           >
             <Input
               placeholder="Task title to be done..."
@@ -84,6 +61,6 @@ function NewTodoForm({ refetchTodos }: Props): JSX.Element {
       </Form>
     </>
   );
-}
+});
 
-export default memo(NewTodoForm);
+export default NewTodoForm;
