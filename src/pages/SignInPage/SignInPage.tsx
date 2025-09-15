@@ -1,14 +1,29 @@
-import { Button, Flex, Form, Input, type FormProps } from 'antd';
-import { Link } from 'react-router';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { selectAuthError } from '@/store/selectors';
+import { signIn } from '@/store/slices/authSlice';
+import { Alert, Button, Flex, Form, Input, type FormProps } from 'antd';
+import { type JSX } from 'react';
+import { Link, useNavigate } from 'react-router';
 
 interface FormField {
   login: string;
   password: string;
 }
 
-function SignInPage() {
-  const signIn: FormProps<FormField>['onFinish'] = (values) => {
-    console.log(values);
+function SignInPage(): JSX.Element {
+  const error = useAppSelector(selectAuthError);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const handleSignIn: FormProps<FormField>['onFinish'] = async ({
+    login,
+    password,
+  }) => {
+    const action = await dispatch(signIn({ login, password }));
+
+    if (signIn.fulfilled.match(action)) {
+      navigate('/', { replace: true });
+    }
   };
 
   return (
@@ -19,7 +34,7 @@ function SignInPage() {
         name="signUp"
         labelCol={{ span: 6 }}
         style={{ minWidth: '38rem' }}
-        onFinish={signIn}
+        onFinish={handleSignIn}
       >
         <Form.Item<FormField>
           name="login"
@@ -47,6 +62,16 @@ function SignInPage() {
           </Flex>
         </Form.Item>
       </Form>
+
+      {!!error && (
+        <Alert
+          message="Error"
+          description={error}
+          type="error"
+          showIcon
+          style={{ width: '100%' }}
+        />
+      )}
     </Flex>
   );
 }

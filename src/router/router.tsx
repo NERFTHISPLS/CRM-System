@@ -1,4 +1,6 @@
 import App from '@/App';
+import ProtectedRoute from '@/components/Auth/ProtectedRoute/ProtectedRoute';
+import PublicRoute from '@/components/Auth/PublicRoute/PublicRoute';
 import AuthLayout from '@/components/ui/AuthLayout/AuthLayout';
 import SignInPage from '@/pages/SignInPage/SignInPage';
 import SignUpPage from '@/pages/SignUpPage/SignUpPage';
@@ -9,7 +11,11 @@ import { createBrowserRouter } from 'react-router';
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />,
+    element: (
+      <ProtectedRoute>
+        <App />
+      </ProtectedRoute>
+    ),
     children: [
       { index: true, element: <TodoListPage /> },
       { path: 'todo-list', element: <TodoListPage /> },
@@ -18,7 +24,11 @@ export const router = createBrowserRouter([
   },
   {
     path: '/auth',
-    element: <AuthLayout />,
+    element: (
+      <PublicRoute>
+        <AuthLayout />
+      </PublicRoute>
+    ),
     children: [
       { path: 'sign-up', element: <SignUpPage /> },
       { path: 'sign-in', element: <SignInPage /> },

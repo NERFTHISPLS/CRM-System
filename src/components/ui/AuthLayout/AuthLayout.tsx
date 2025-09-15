@@ -9,8 +9,7 @@ function AuthLayout(): JSX.Element {
         <Flex
           vertical
           align="center"
-          justify="center"
-          style={{ height: '100%' }}
+          style={{ height: '100%', paddingTop: 200 }}
         >
           <Outlet />
         </Flex>

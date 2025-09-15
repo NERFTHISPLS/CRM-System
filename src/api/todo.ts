@@ -5,9 +5,7 @@ import type {
   TodoInfo,
   TodoRequest,
 } from '@/types/todo';
-import axios from 'axios';
-
-const apiClient = axios.create({ baseURL: 'https://easydev.club/api/v1' });
+import { apiClient } from './apiClient';
 
 export async function getTodos(
   todoFilterValue: TodoFilterValue = 'all'
@@ -37,5 +35,5 @@ export async function updateTodo(
 }
 
 export async function removeTodo(id: Todo['id']): Promise<void> {
-  await apiClient.delete(`todos/${id}`);
+  await apiClient.delete(`/todos/${id}`);
 }

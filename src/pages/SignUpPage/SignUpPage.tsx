@@ -1,24 +1,67 @@
-import { Button, Flex, Form, Input, type FormProps } from 'antd';
+import type { UserRegistration } from '@/types/auth';
+import { Alert, Button, Flex, Form, Input, type FormProps } from 'antd';
 import { Link } from 'react-router';
+import { signUp } from '@/api/auth';
+import { useState, type JSX, type ReactNode } from 'react';
+import { getErrorMessage } from '@/utils/helpers';
 
 interface FormField {
-  name: string;
+  username: string;
   login: string;
   password: string;
   passwordConfirm: string;
   email: string;
-  phone?: string;
+  phoneNumber?: string;
 }
 
 const MIN_LOGIN_LENGTH = 2;
 const MAX_LOGIN_LENGTH = 60;
 const MAX_USERNAME_LENGTH = 60;
-const MIN_PASSWORD_LENGTH = 2;
+const MIN_PASSWORD_LENGTH = 6;
 const MAX_PASSWORD_LENGTH = 60;
 
-function SignUpPage() {
-  const signUp: FormProps<FormField>['onFinish'] = (values) => {
-    console.log(values);
+const successMessage: ReactNode = (
+  <>
+    <p>Your new account was successfully created!</p>
+    <p>You can now sign in with your data.</p>
+    <Link to="/auth/sign-in">Sign In</Link>
+  </>
+);
+
+function SignUpPage(): JSX.Element {
+  const [form] = Form.useForm();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [signUpError, setSignUpError] = useState<string>('');
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
+
+  const handleSignUp: FormProps<FormField>['onFinish'] = async ({
+    login,
+    username,
+    password,
+    email,
+    phoneNumber = '',
+  }) => {
+    const signUpReqBody: UserRegistration = {
+      login,
+      username,
+      password,
+      email,
+      phoneNumber,
+    };
+
+    try {
+      setSignUpError('');
+      setIsSuccess(false);
+      setIsLoading(true);
+      await signUp(signUpReqBody);
+      setIsSuccess(true);
+      form.resetFields();
+    } catch (err) {
+      setSignUpError(getErrorMessage(err));
+      setIsSuccess(false);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -27,12 +70,13 @@ function SignUpPage() {
 
       <Form
         name="signUp"
+        form={form}
         labelCol={{ span: 6 }}
         style={{ minWidth: '38rem' }}
-        onFinish={signUp}
+        onFinish={handleSignUp}
       >
         <Form.Item<FormField>
-          name="name"
+          name="username"
           label="Username"
           rules={[
             { required: true, message: 'Please input your username' },
@@ -41,12 +85,12 @@ function SignUpPage() {
               message: `Username can't be longer than ${MAX_USERNAME_LENGTH} characters`,
             },
             {
-              pattern: /^[a-zA-Zа-яА-ЯёЁ\s]+$/,
+              pattern: /^[a-zA-Zа-яА-ЯёЁ]+$/,
               message: 'Username can only contain Russian and English letters',
             },
           ]}
         >
-          <Input placeholder="John Doe" />
+          <Input placeholder="John" disabled={isLoading} />
         </Form.Item>
 
         <Form.Item<FormField>
@@ -68,7 +112,7 @@ function SignUpPage() {
             },
           ]}
         >
-          <Input placeholder="johndoe" />
+          <Input placeholder="johndoe" disabled={isLoading} />
         </Form.Item>
 
         <Form.Item<FormField>
@@ -87,7 +131,7 @@ function SignUpPage() {
           ]}
           hasFeedback
         >
-          <Input.Password placeholder="************" />
+          <Input.Password placeholder="************" disabled={isLoading} />
         </Form.Item>
 
         <Form.Item<FormField>
@@ -108,7 +152,7 @@ function SignUpPage() {
           ]}
           hasFeedback
         >
-          <Input.Password placeholder="************" />
+          <Input.Password placeholder="************" disabled={isLoading} />
         </Form.Item>
 
         <Form.Item<FormField>
@@ -122,11 +166,11 @@ function SignUpPage() {
             },
           ]}
         >
-          <Input placeholder="example@mail.com" />
+          <Input placeholder="example@mail.com" disabled={isLoading} />
         </Form.Item>
 
         <Form.Item<FormField>
-          name="phone"
+          name="phoneNumber"
           label="Phone number"
           rules={[
             {
@@ -136,12 +180,12 @@ function SignUpPage() {
             },
           ]}
         >
-          <Input placeholder="+71234567890" />
+          <Input placeholder="+71234567890" disabled={isLoading} />
         </Form.Item>
 
         <Form.Item label={null}>
           <Flex align="center" gap="middle">
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" disabled={isLoading}>
               Sign Up
             </Button>
 
@@ -149,6 +193,26 @@ function SignUpPage() {
           </Flex>
         </Form.Item>
       </Form>
+
+      {!!signUpError && (
+        <Alert
+          message="Error"
+          description={signUpError}
+          type="error"
+          showIcon
+          style={{ width: '100%' }}
+        />
+      )}
+
+      {isSuccess && (
+        <Alert
+          message="Success"
+          description={successMessage}
+          type="success"
+          showIcon
+          style={{ width: '100%' }}
+        />
+      )}
     </Flex>
   );
 }
