@@ -1,0 +1,104 @@
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { getProfile, logout } from '@/store/slices/userSlice';
+import type { RootState } from '@/types/store';
+import { storage } from '@/utils/storage';
+import { Alert, Button, Flex, Form, Input, Spin } from 'antd';
+import FormItem from 'antd/es/form/FormItem';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router';
+
+interface FormField {
+  username: string;
+  email: string;
+  phoneNumber: string;
+}
+
+function ProfilePage() {
+  const { profile, isLoading, error } = useAppSelector(
+    (state: RootState) => state.user
+  );
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    async function loadProfileInfo(): Promise<void> {
+      await dispatch(getProfile());
+    }
+
+    loadProfileInfo();
+  }, [dispatch]);
+
+  async function handleLogout(): Promise<void> {
+    const action = await dispatch(logout());
+
+    if (logout.fulfilled.match(action)) {
+      storage.clearTokens();
+      navigate('/auth/sign-in', { replace: true });
+    }
+  }
+
+  if (!profile || isLoading) {
+    return (
+      <Flex justify="center" style={{ width: '100%', marginTop: 50 }}>
+        <Spin spinning={isLoading} />
+      </Flex>
+    );
+  }
+
+  return (
+    <Flex gap="middle" vertical style={{ padding: '1rem' }}>
+      <Flex justify="space-between">
+        <h2>Profile Info</h2>
+        <Button color="primary" variant="outlined" onClick={handleLogout}>
+          Logout
+        </Button>
+      </Flex>
+
+      <Form labelCol={{ span: 3 }}>
+        <FormItem<FormField>
+          name="username"
+          label="Username"
+          initialValue={profile.username}
+        >
+          <Input disabled />
+        </FormItem>
+
+        <FormItem<FormField>
+          name="email"
+          label="Email"
+          initialValue={profile.email}
+        >
+          <Input disabled />
+        </FormItem>
+
+        <FormItem<FormField>
+          name="phoneNumber"
+          label="Phone number"
+          initialValue={profile.phoneNumber}
+        >
+          <Input disabled />
+        </FormItem>
+      </Form>
+
+      <Alert
+        message="Warning"
+        description="Sorry, you can't change your data now. We are working on it."
+        type="warning"
+        showIcon
+        style={{ width: '100%' }}
+      />
+
+      {!!error && (
+        <Alert
+          message="Error"
+          description={error}
+          type="error"
+          showIcon
+          style={{ width: '100%' }}
+        />
+      )}
+    </Flex>
+  );
+}
+
+export default ProfilePage;

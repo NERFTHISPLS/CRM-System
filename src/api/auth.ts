@@ -1,11 +1,11 @@
 import type {
   AuthData,
-  Profile,
   RefreshToken,
   Token,
   UserRegistration,
 } from '@/types/auth';
 import { apiClient } from './apiClient';
+import type { Profile } from '@/types/user';
 
 export async function signUp(newUserData: UserRegistration): Promise<Profile> {
   const res = await apiClient.post<Profile>('/auth/signup', newUserData);

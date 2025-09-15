@@ -10,6 +10,7 @@ import {
   createSlice,
   type PayloadAction,
 } from '@reduxjs/toolkit';
+import { logout } from './userSlice';
 
 export interface AuthState {
   isAuthenticated: boolean;
@@ -92,6 +93,10 @@ export const authSlice = createSlice({
         state.isLoading = false;
         state.isAuthenticated = false;
         state.error = action.payload ?? 'Unknown error occurred';
+      })
+
+      .addCase(logout.fulfilled, () => {
+        return { ...initialState, isInitialized: true };
       });
   },
 });
