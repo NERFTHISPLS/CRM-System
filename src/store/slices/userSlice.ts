@@ -1,6 +1,7 @@
 import { getProfileInfo, logout as logoutApi } from '@/api/user';
 import type { Profile } from '@/types/user';
 import { getErrorMessage } from '@/utils/helpers';
+import { storage } from '@/utils/storage';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 export interface UserState {
@@ -34,6 +35,8 @@ export const logout = createAsyncThunk<void, void, { rejectValue: string }>(
       await logoutApi();
     } catch (err) {
       return rejectWithValue(getErrorMessage(err));
+    } finally {
+      storage.clearTokens();
     }
   }
 );
@@ -50,6 +53,7 @@ export const userSlice = createSlice({
       .addCase(getProfile.fulfilled, (state, action) => {
         state.isLoading = false;
         state.profile = action.payload;
+        state.error = null;
       })
       .addCase(getProfile.rejected, (state, action) => {
         state.isLoading = false;

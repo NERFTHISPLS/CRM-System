@@ -1,7 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getProfile, logout } from '@/store/slices/userSlice';
 import type { RootState } from '@/types/store';
-import { storage } from '@/utils/storage';
 import { Alert, Button, Flex, Form, Input, Spin } from 'antd';
 import FormItem from 'antd/es/form/FormItem';
 import { useEffect } from 'react';
@@ -29,12 +28,9 @@ function ProfilePage() {
   }, [dispatch]);
 
   async function handleLogout(): Promise<void> {
-    const action = await dispatch(logout());
+    await dispatch(logout());
 
-    if (logout.fulfilled.match(action)) {
-      storage.clearTokens();
-      navigate('/auth/sign-in', { replace: true });
-    }
+    navigate('/auth/sign-in', { replace: true });
   }
 
   if (!profile || isLoading) {
