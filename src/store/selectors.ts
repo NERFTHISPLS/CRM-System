@@ -7,6 +7,10 @@ export const selectAuthError = (state: RootState) => state.auth.error;
 export const selectIsInitialized = (state: RootState) =>
   state.auth.isInitialized;
 
+export const selectProfile = (state: RootState) => state.user.profile;
+export const selectUserIsLoading = (state: RootState) => state.user.isLoading;
+export const selectUserError = (state: RootState) => state.user.error;
+
 export const selectTodos = (state: RootState) => state.todos.todos;
 export const selectTodosInfo = (state: RootState) => state.todos.info;
 export const selectTodosIsLoading = (state: RootState) => state.todos.isLoading;

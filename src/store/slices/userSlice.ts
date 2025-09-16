@@ -56,6 +56,7 @@ export const userSlice = createSlice({
         state.error = null;
       })
       .addCase(getProfile.rejected, (state, action) => {
+        state.profile = null;
         state.isLoading = false;
         state.error = action.payload ?? 'Unknown error occurred';
       })

@@ -104,12 +104,8 @@ export const authSlice = createSlice({
         state.accessToken = null;
       })
 
-      .addCase(getProfile.rejected, (_, action) => {
-        return {
-          ...initialState,
-          error: action.payload ?? 'Unknown error occurred',
-          isInitialized: true,
-        };
+      .addCase(getProfile.rejected, (state, action) => {
+        state.error = action.payload ?? 'Unknown error occurred';
       })
 
       .addCase(logout.fulfilled, () => {

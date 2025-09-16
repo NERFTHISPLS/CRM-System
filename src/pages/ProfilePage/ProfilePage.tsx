@@ -1,6 +1,10 @@
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import {
+  selectProfile,
+  selectUserError,
+  selectUserIsLoading,
+} from '@/store/selectors';
 import { getProfile, logout } from '@/store/slices/userSlice';
-import type { RootState } from '@/types/store';
 import { Alert, Button, Flex, Form, Input, Spin } from 'antd';
 import FormItem from 'antd/es/form/FormItem';
 import { useEffect } from 'react';
@@ -13,9 +17,9 @@ interface FormField {
 }
 
 function ProfilePage() {
-  const { profile, isLoading, error } = useAppSelector(
-    (state: RootState) => state.user
-  );
+  const profile = useAppSelector(selectProfile);
+  const isLoading = useAppSelector(selectUserIsLoading);
+  const error = useAppSelector(selectUserError);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -33,11 +37,23 @@ function ProfilePage() {
     navigate('/auth/sign-in', { replace: true });
   }
 
-  if (!profile || isLoading) {
+  if (isLoading) {
     return (
       <Flex justify="center" style={{ width: '100%', marginTop: 50 }}>
         <Spin spinning={isLoading} />
       </Flex>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert
+        message="Error"
+        description={error}
+        type="error"
+        showIcon
+        style={{ width: '100%' }}
+      />
     );
   }
 
@@ -54,7 +70,7 @@ function ProfilePage() {
         <FormItem<FormField>
           name="username"
           label="Username"
-          initialValue={profile.username}
+          initialValue={profile?.username}
         >
           <Input disabled />
         </FormItem>
@@ -62,7 +78,7 @@ function ProfilePage() {
         <FormItem<FormField>
           name="email"
           label="Email"
-          initialValue={profile.email}
+          initialValue={profile?.email}
         >
           <Input disabled />
         </FormItem>
@@ -70,7 +86,7 @@ function ProfilePage() {
         <FormItem<FormField>
           name="phoneNumber"
           label="Phone number"
-          initialValue={profile.phoneNumber}
+          initialValue={profile?.phoneNumber}
         >
           <Input disabled />
         </FormItem>
@@ -83,16 +99,6 @@ function ProfilePage() {
         showIcon
         style={{ width: '100%' }}
       />
-
-      {!!error && (
-        <Alert
-          message="Error"
-          description={error}
-          type="error"
-          showIcon
-          style={{ width: '100%' }}
-        />
-      )}
     </Flex>
   );
 }
