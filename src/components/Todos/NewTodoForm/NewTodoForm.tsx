@@ -1,18 +1,16 @@
-import { memo, useState, type JSX } from 'react';
-import { createTodo } from '@/api/todo';
+import { useState } from 'react';
 import { getErrorMessage } from '@utils/helpers';
 import { Button, Form, Input, message, Space, type FormProps } from 'antd';
 import { TODO_TITLE_INPUT_RULES } from '@/utils/constants';
+import { useAppDispatch } from '@/store/hooks';
+import { createTodo, fetchTodos } from '@/store/slices/todosSlice';
 
 interface FormField {
   todoTitle: string;
 }
 
-interface Props {
-  refetchTodos: () => Promise<void>;
-}
-
-const NewTodoForm = memo<Props>(({ refetchTodos }): JSX.Element => {
+function NewTodoForm() {
+  const dispatch = useAppDispatch();
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -20,8 +18,8 @@ const NewTodoForm = memo<Props>(({ refetchTodos }): JSX.Element => {
   const createNewTodo: FormProps<FormField>['onFinish'] = async (values) => {
     try {
       setIsLoading(true);
-      await createTodo(values.todoTitle.trim());
-      await refetchTodos();
+      await dispatch(createTodo(values.todoTitle.trim())).unwrap();
+      await dispatch(fetchTodos());
       form.resetFields();
       messageApi.success('Task was created successfully');
     } catch (err) {
@@ -61,6 +59,6 @@ const NewTodoForm = memo<Props>(({ refetchTodos }): JSX.Element => {
       </Form>
     </>
   );
-});
+}
 
 export default NewTodoForm;

@@ -1,6 +1,9 @@
-import type { TodoFilterValue, TodoInfo } from '@/types/todo';
+import type { TodoFilterValue } from '@/types/todo';
 import type { JSX } from 'react';
 import { Tabs, type TabsProps } from 'antd';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { selectTodosFilterValue, selectTodosInfo } from '@/store/selectors';
+import { setFilterValue, fetchTodos } from '@/store/slices/todosSlice';
 
 interface TabConfig {
   key: TodoFilterValue;
@@ -13,12 +16,11 @@ const TAB_CONFIG: TabConfig[] = [
   { key: 'completed', label: 'Completed' },
 ];
 
-interface Props {
-  countInfo: TodoInfo | null;
-  onSelected: (selected: TodoFilterValue) => void;
-}
+function TodosFilter(): JSX.Element | null {
+  const dispatch = useAppDispatch();
+  const countInfo = useAppSelector(selectTodosInfo);
+  const activeKey = useAppSelector(selectTodosFilterValue);
 
-function TodosFilter({ countInfo, onSelected }: Props): JSX.Element | null {
   if (!countInfo) {
     return null;
   }
@@ -32,11 +34,13 @@ function TodosFilter({ countInfo, onSelected }: Props): JSX.Element | null {
     ),
   }));
 
+  async function handleTabsChange(key: string): Promise<void> {
+    dispatch(setFilterValue(key as TodoFilterValue));
+    await dispatch(fetchTodos());
+  }
+
   return (
-    <Tabs
-      items={tabItems}
-      onChange={(key) => onSelected(key as TodoFilterValue)}
-    />
+    <Tabs items={tabItems} activeKey={activeKey} onChange={handleTabsChange} />
   );
 }
 
