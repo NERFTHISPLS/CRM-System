@@ -2,7 +2,7 @@ import type { TodoFilterValue } from '@/types/todo';
 import type { JSX } from 'react';
 import { Tabs, type TabsProps } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { selectTodosFilterValue, selectTodosInfo } from '@/store/selectors';
+import { selectTodosFilterValue, selectTodosListInfo } from '@/store/selectors';
 import { setFilterValue, fetchTodos } from '@/store/slices/todosSlice';
 
 interface TabConfig {
@@ -18,7 +18,7 @@ const TAB_CONFIG: TabConfig[] = [
 
 function TodosFilter(): JSX.Element | null {
   const dispatch = useAppDispatch();
-  const countInfo = useAppSelector(selectTodosInfo);
+  const countInfo = useAppSelector(selectTodosListInfo);
   const activeKey = useAppSelector(selectTodosFilterValue);
 
   if (!countInfo) {

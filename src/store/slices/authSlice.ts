@@ -9,21 +9,25 @@ import {
   createSlice,
   type PayloadAction,
 } from '@reduxjs/toolkit';
-import { getProfile, logout } from './userSlice';
 import { tokenService } from '@/utils/tokenService';
+import {
+  addAsyncBuilderCases,
+  initAsyncParticle,
+  type AsyncParticle,
+} from '../utils';
 
 export interface AuthState {
   isAuthenticated: boolean;
-  isLoading: boolean;
-  error: string | null;
   isInitialized: boolean;
+  signIn: AsyncParticle;
+  fetchTokens: AsyncParticle;
 }
 
 const initialState: AuthState = {
   isAuthenticated: false,
-  isLoading: false,
-  error: null,
   isInitialized: false,
+  signIn: initAsyncParticle(),
+  fetchTokens: initAsyncParticle(),
 };
 
 export const fetchTokens = createAsyncThunk<
@@ -65,53 +69,16 @@ export const authSlice = createSlice({
     setIsInitialized(state, action: PayloadAction<boolean>) {
       state.isInitialized = action.payload;
     },
+    setIsAuthenticated(state, action: PayloadAction<boolean>) {
+      state.isAuthenticated = action.payload;
+    },
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(signIn.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(signIn.fulfilled, (state) => {
-        state.isLoading = false;
-        state.error = null;
-        state.isAuthenticated = true;
-      })
-      .addCase(signIn.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload ?? 'Unknown error occurred';
-      })
-
-      .addCase(fetchTokens.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(fetchTokens.fulfilled, (state) => {
-        state.isLoading = false;
-        state.isAuthenticated = true;
-        state.error = null;
-      })
-      .addCase(fetchTokens.rejected, (state, action) => {
-        state.isLoading = false;
-        state.isAuthenticated = false;
-        state.error = action.payload ?? 'Unknown error occurred';
-      })
-
-      .addCase(getProfile.rejected, (state, action) => {
-        state.error = action.payload ?? 'Unknown error occurred';
-      })
-
-      .addCase(logout.fulfilled, () => {
-        return { ...initialState, isInitialized: true };
-      })
-      .addCase(logout.rejected, (_, action) => {
-        return {
-          ...initialState,
-          error: action.payload ?? 'Unknown error occurred',
-          isInitialized: true,
-        };
-      });
+    addAsyncBuilderCases(builder, signIn, 'signIn');
+    addAsyncBuilderCases(builder, fetchTokens, 'fetchTokens');
   },
 });
 
-export const { setIsInitialized } = authSlice.actions;
+export const { setIsInitialized, setIsAuthenticated } = authSlice.actions;
 
 export default authSlice.reducer;

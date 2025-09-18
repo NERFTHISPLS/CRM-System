@@ -1,16 +1,15 @@
-import type { MetaResponse } from '@/types/general';
 import type {
+  GetTodoResponse,
   Todo,
   TodoFilterValue,
-  TodoInfo,
   TodoRequest,
 } from '@/types/todo';
 import { apiClient } from './apiClient';
 
 export async function getTodos(
   todoFilterValue: TodoFilterValue = 'all'
-): Promise<MetaResponse<Todo, TodoInfo>> {
-  const res = await apiClient.get<MetaResponse<Todo, TodoInfo>>('/todos', {
+): Promise<GetTodoResponse> {
+  const res = await apiClient.get<GetTodoResponse>('/todos', {
     params: { filter: todoFilterValue },
   });
 

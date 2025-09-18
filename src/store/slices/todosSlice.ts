@@ -10,32 +10,31 @@ import {
   removeTodo as removeTodoApi,
 } from '@/api/todo';
 import type {
+  GetTodoResponse,
   Todo,
   TodoFilterValue,
-  TodoInfo,
   TodoRequest,
 } from '@/types/todo';
 import { getErrorMessage } from '@/utils/helpers';
 import type { RootState } from '@/types/store';
+import {
+  addAsyncBuilderCases,
+  initAsyncParticle,
+  type AsyncParticle,
+} from '../utils';
 
 export interface TodosState {
-  isLoading: boolean;
-  todos: Todo[];
-  info: TodoInfo | null;
   filterValue: TodoFilterValue;
-  error: string | null;
+  fetchTodos: AsyncParticle<GetTodoResponse>;
 }
 
 const initialState: TodosState = {
-  isLoading: false,
-  todos: [],
-  info: null,
   filterValue: 'all',
-  error: null,
+  fetchTodos: initAsyncParticle(),
 };
 
 export const fetchTodos = createAsyncThunk<
-  { data: Todo[]; info: TodoInfo },
+  GetTodoResponse,
   void,
   { state: RootState; rejectValue: string }
 >('todos/fetchTodos', async (_: void, { getState, rejectWithValue }) => {
@@ -43,7 +42,7 @@ export const fetchTodos = createAsyncThunk<
     const filter = getState().todos.filterValue;
     const res = await getTodosApi(filter);
 
-    return { data: res.data, info: res.info };
+    return res;
   } catch (err) {
     return rejectWithValue(getErrorMessage(err));
   }
@@ -94,21 +93,7 @@ export const todosSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchTodos.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(fetchTodos.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.todos = action.payload.data;
-        state.info = action.payload.info;
-        state.error = null;
-      })
-      .addCase(fetchTodos.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload ?? 'Unknown error occurred';
-      });
+    addAsyncBuilderCases(builder, fetchTodos, 'fetchTodos');
   },
 });
 

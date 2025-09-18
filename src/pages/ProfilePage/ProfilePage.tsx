@@ -1,9 +1,10 @@
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   selectProfile,
-  selectUserError,
-  selectUserIsLoading,
+  selectProfileError,
+  selectProfileIsLoading,
 } from '@/store/selectors';
+import { setIsAuthenticated } from '@/store/slices/authSlice';
 import { getProfile, logout } from '@/store/slices/userSlice';
 import { Alert, Button, Flex, Form, Input, Spin } from 'antd';
 import FormItem from 'antd/es/form/FormItem';
@@ -18,8 +19,8 @@ interface FormField {
 
 function ProfilePage() {
   const profile = useAppSelector(selectProfile);
-  const isLoading = useAppSelector(selectUserIsLoading);
-  const error = useAppSelector(selectUserError);
+  const isLoading = useAppSelector(selectProfileIsLoading);
+  const error = useAppSelector(selectProfileError);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -33,6 +34,7 @@ function ProfilePage() {
 
   async function handleLogout(): Promise<void> {
     await dispatch(logout());
+    dispatch(setIsAuthenticated(false));
 
     navigate('/auth/sign-in', { replace: true });
   }

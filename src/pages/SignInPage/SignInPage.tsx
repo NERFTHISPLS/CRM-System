@@ -1,6 +1,9 @@
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { selectAuthError } from '@/store/selectors';
-import { signIn } from '@/store/slices/authSlice';
+import {
+  selectAuthFetchTokensError,
+  selectAuthSignInError,
+} from '@/store/selectors';
+import { setIsAuthenticated, signIn } from '@/store/slices/authSlice';
 import { Alert, Button, Flex, Form, Input, type FormProps } from 'antd';
 import { type JSX } from 'react';
 import { Link, useNavigate } from 'react-router';
@@ -11,7 +14,8 @@ interface FormField {
 }
 
 function SignInPage(): JSX.Element {
-  const error = useAppSelector(selectAuthError);
+  const signInError = useAppSelector(selectAuthSignInError);
+  const fetchTokensError = useAppSelector(selectAuthFetchTokensError);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -22,6 +26,7 @@ function SignInPage(): JSX.Element {
     const action = await dispatch(signIn({ login, password }));
 
     if (signIn.fulfilled.match(action)) {
+      dispatch(setIsAuthenticated(true));
       navigate('/', { replace: true });
     }
   };
@@ -63,11 +68,21 @@ function SignInPage(): JSX.Element {
         </Form.Item>
       </Form>
 
-      {!!error && (
+      {signInError && (
         <Alert
           message="Error"
-          description={error}
+          description={signInError}
           type="error"
+          showIcon
+          style={{ width: '100%' }}
+        />
+      )}
+
+      {fetchTokensError && (
+        <Alert
+          message="Warning"
+          description={fetchTokensError}
+          type="warning"
           showIcon
           style={{ width: '100%' }}
         />

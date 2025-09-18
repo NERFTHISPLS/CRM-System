@@ -3,17 +3,24 @@ import type { Profile } from '@/types/user';
 import { getErrorMessage } from '@/utils/helpers';
 import { tokenService } from '@/utils/tokenService';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import {
+  addAsyncBuilderCases,
+  initAsyncParticle,
+  type AsyncParticle,
+} from '../utils';
 
 export interface UserState {
-  profile: Profile | null;
   isLoading: boolean;
   error: string | null;
+  getProfile: AsyncParticle<Profile>;
+  logout: AsyncParticle<void>;
 }
 
 const initialState: UserState = {
-  profile: null,
   isLoading: false,
   error: null,
+  getProfile: initAsyncParticle(),
+  logout: initAsyncParticle(),
 };
 
 export const getProfile = createAsyncThunk<
@@ -46,31 +53,8 @@ export const userSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder
-      .addCase(getProfile.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getProfile.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.profile = action.payload;
-        state.error = null;
-      })
-      .addCase(getProfile.rejected, (state, action) => {
-        state.profile = null;
-        state.isLoading = false;
-        state.error = action.payload ?? 'Unknown error occurred';
-      })
-
-      .addCase(logout.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(logout.fulfilled, () => {
-        return initialState;
-      })
-      .addCase(logout.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload ?? 'Unknown error';
-      });
+    addAsyncBuilderCases(builder, getProfile, 'getProfile');
+    addAsyncBuilderCases(builder, logout, 'logout');
   },
 });
 
