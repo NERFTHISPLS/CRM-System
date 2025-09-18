@@ -8,7 +8,7 @@ interface Props {
 }
 
 function ProtectedRoute({ children }: Props): ReactNode {
-  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const isAuthenticated: boolean = useAppSelector(selectIsAuthenticated);
 
   if (isAuthenticated) {
     return children;

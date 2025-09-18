@@ -14,8 +14,10 @@ interface FormField {
 }
 
 function SignInPage(): JSX.Element {
-  const signInError = useAppSelector(selectAuthSignInError);
-  const fetchTokensError = useAppSelector(selectAuthFetchTokensError);
+  const signInError: string | null = useAppSelector(selectAuthSignInError);
+  const fetchTokensError: string | null = useAppSelector(
+    selectAuthFetchTokensError
+  );
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 

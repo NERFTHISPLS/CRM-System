@@ -18,8 +18,8 @@ interface Props {
 
 function AuthInitializer({ children }: Props): ReactNode {
   const dispatch = useAppDispatch();
-  const isInitialized = useAppSelector(selectIsInitialized);
-  const isLoading = useAppSelector(selectAuthSignInIsLoading);
+  const isInitialized: boolean = useAppSelector(selectIsInitialized);
+  const isLoading: boolean = useAppSelector(selectAuthSignInIsLoading);
 
   useEffect(() => {
     async function init(): Promise<void> {

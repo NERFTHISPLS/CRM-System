@@ -6,6 +6,7 @@ import {
 } from '@/store/selectors';
 import { setIsAuthenticated } from '@/store/slices/authSlice';
 import { getProfile, logout } from '@/store/slices/userSlice';
+import type { Profile } from '@/types/user';
 import { Alert, Button, Flex, Form, Input, Spin } from 'antd';
 import FormItem from 'antd/es/form/FormItem';
 import { useEffect } from 'react';
@@ -18,9 +19,9 @@ interface FormField {
 }
 
 function ProfilePage() {
-  const profile = useAppSelector(selectProfile);
-  const isLoading = useAppSelector(selectProfileIsLoading);
-  const error = useAppSelector(selectProfileError);
+  const profile: Profile | null = useAppSelector(selectProfile);
+  const isLoading: boolean = useAppSelector(selectProfileIsLoading);
+  const error: string | null = useAppSelector(selectProfileError);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 

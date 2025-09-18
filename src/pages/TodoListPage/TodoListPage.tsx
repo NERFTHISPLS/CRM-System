@@ -15,8 +15,8 @@ const REFETCH_TODOS_INTERVAL_MS = 5000;
 
 function TodoListPage(): JSX.Element {
   const dispatch = useAppDispatch();
-  const isLoading = useAppSelector(selectTodosListIsLoading);
-  const error = useAppSelector(selectTodosListError);
+  const isLoading: boolean = useAppSelector(selectTodosListIsLoading);
+  const error: string | null = useAppSelector(selectTodosListError);
   const [showLoader, setShowLoader] = useState<boolean>(false);
 
   // On the initial render useEffect will run fetchTodos and fetchTodos will cause rerendering.

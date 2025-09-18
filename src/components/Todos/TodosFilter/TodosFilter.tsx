@@ -1,4 +1,4 @@
-import type { TodoFilterValue } from '@/types/todo';
+import type { TodoFilterValue, TodoInfo } from '@/types/todo';
 import type { JSX } from 'react';
 import { Tabs, type TabsProps } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -18,8 +18,8 @@ const TAB_CONFIG: TabConfig[] = [
 
 function TodosFilter(): JSX.Element | null {
   const dispatch = useAppDispatch();
-  const countInfo = useAppSelector(selectTodosListInfo);
-  const activeKey = useAppSelector(selectTodosFilterValue);
+  const countInfo: TodoInfo | null = useAppSelector(selectTodosListInfo);
+  const activeKey: TodoFilterValue = useAppSelector(selectTodosFilterValue);
 
   if (!countInfo) {
     return null;
