@@ -7,9 +7,6 @@ import { router } from './router/router';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
 import AuthInitializer from './components/Auth/AuthInitializer/AuthInitializer';
-import { setupInterceptors } from './api/apiClient';
-
-setupInterceptors(store);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

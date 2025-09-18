@@ -1,7 +1,7 @@
 import { getProfileInfo, logout as logoutApi } from '@/api/user';
 import type { Profile } from '@/types/user';
 import { getErrorMessage } from '@/utils/helpers';
-import { storage } from '@/utils/storage';
+import { tokenService } from '@/utils/tokenService';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 export interface UserState {
@@ -36,7 +36,7 @@ export const logout = createAsyncThunk<void, void, { rejectValue: string }>(
     } catch (err) {
       return rejectWithValue(getErrorMessage(err));
     } finally {
-      storage.clearTokens();
+      tokenService.clearTokens();
     }
   }
 );

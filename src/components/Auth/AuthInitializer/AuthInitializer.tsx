@@ -1,7 +1,7 @@
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { selectAuthIsLoading, selectIsInitialized } from '@/store/selectors';
-import { getAccessToken, setIsInitialized } from '@/store/slices/authSlice';
-import { storage } from '@/utils/storage';
+import { fetchTokens, setIsInitialized } from '@/store/slices/authSlice';
+import { tokenService } from '@/utils/tokenService';
 import { Flex, Spin } from 'antd';
 import { useEffect, type ReactNode } from 'react';
 
@@ -16,9 +16,9 @@ function AuthInitializer({ children }: Props): ReactNode {
 
   useEffect(() => {
     async function init(): Promise<void> {
-      const refreshToken = storage.getRefreshToken();
+      const { refreshToken } = tokenService.getTokens();
       if (refreshToken) {
-        await dispatch(getAccessToken(refreshToken));
+        await dispatch(fetchTokens(refreshToken));
       }
 
       dispatch(setIsInitialized(true));

@@ -4,20 +4,19 @@ import {
 } from '@/api/auth';
 import type { AuthData, Token } from '@/types/auth';
 import { getErrorMessage } from '@/utils/helpers';
-import { storage } from '@/utils/storage';
 import {
   createAsyncThunk,
   createSlice,
   type PayloadAction,
 } from '@reduxjs/toolkit';
 import { getProfile, logout } from './userSlice';
+import { tokenService } from '@/utils/tokenService';
 
 export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
   isInitialized: boolean;
-  accessToken: string | null;
 }
 
 const initialState: AuthState = {
@@ -25,21 +24,20 @@ const initialState: AuthState = {
   isLoading: false,
   error: null,
   isInitialized: false,
-  accessToken: null,
 };
 
-export const getAccessToken = createAsyncThunk<
+export const fetchTokens = createAsyncThunk<
   Token,
   string,
   { rejectValue: string }
->('auth/getAccessToken', async (refreshToken, { rejectWithValue }) => {
+>('auth/fetchTokens', async (refreshToken, { rejectWithValue }) => {
   try {
     const data = await refreshTokenApi({ refreshToken });
-    storage.setRefreshToken(data.refreshToken);
+    tokenService.setTokens(data);
 
     return data;
   } catch (err) {
-    storage.clearTokens();
+    tokenService.clearTokens();
 
     return rejectWithValue(getErrorMessage(err));
   }
@@ -52,7 +50,7 @@ export const signIn = createAsyncThunk<
 >('auth/signIn', async (authData: AuthData, { rejectWithValue }) => {
   try {
     const data = await signInApi(authData);
-    storage.setRefreshToken(data.refreshToken);
+    tokenService.setTokens(data);
 
     return data;
   } catch (err) {
@@ -67,41 +65,34 @@ export const authSlice = createSlice({
     setIsInitialized(state, action: PayloadAction<boolean>) {
       state.isInitialized = action.payload;
     },
-    setAccessToken(state, action: PayloadAction<string | null>) {
-      state.accessToken = action.payload;
-      state.isAuthenticated = Boolean(action.payload);
-    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(signIn.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(signIn.fulfilled, (state, action) => {
+      .addCase(signIn.fulfilled, (state) => {
         state.isLoading = false;
         state.error = null;
         state.isAuthenticated = true;
-        state.accessToken = action.payload.accessToken;
       })
       .addCase(signIn.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload ?? 'Unknown error occurred';
       })
 
-      .addCase(getAccessToken.pending, (state) => {
+      .addCase(fetchTokens.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(getAccessToken.fulfilled, (state, action) => {
+      .addCase(fetchTokens.fulfilled, (state) => {
         state.isLoading = false;
         state.isAuthenticated = true;
         state.error = null;
-        state.accessToken = action.payload.accessToken;
       })
-      .addCase(getAccessToken.rejected, (state, action) => {
+      .addCase(fetchTokens.rejected, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = false;
         state.error = action.payload ?? 'Unknown error occurred';
-        state.accessToken = null;
       })
 
       .addCase(getProfile.rejected, (state, action) => {
@@ -121,6 +112,6 @@ export const authSlice = createSlice({
   },
 });
 
-export const { setIsInitialized, setAccessToken } = authSlice.actions;
+export const { setIsInitialized } = authSlice.actions;
 
 export default authSlice.reducer;
