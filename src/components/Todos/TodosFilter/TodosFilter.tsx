@@ -1,9 +1,10 @@
-import type { TodoFilterValue } from '@/types/todo';
+import type { GetTodoResponse, TodoFilterValue } from '@/types/todo';
 import type { JSX } from 'react';
 import { Tabs, type TabsProps } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { selectTodosFilterValue, selectTodosList } from '@/store/selectors';
 import { setFilterValue, fetchTodos } from '@/store/slices/todosSlice';
+import type { AsyncRequestData } from '@/store/utils';
 
 interface TabConfig {
   key: TodoFilterValue;
@@ -18,7 +19,7 @@ const TAB_CONFIG: TabConfig[] = [
 
 function TodosFilter(): JSX.Element | null {
   const dispatch = useAppDispatch();
-  const { data }: ReturnType<typeof selectTodosList> =
+  const { data }: AsyncRequestData<GetTodoResponse> =
     useAppSelector(selectTodosList);
   const activeKey: TodoFilterValue = useAppSelector(selectTodosFilterValue);
 

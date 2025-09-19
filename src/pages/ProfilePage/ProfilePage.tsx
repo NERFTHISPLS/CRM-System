@@ -2,6 +2,8 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { selectProfile } from '@/store/selectors';
 import { setIsAuthenticated } from '@/store/slices/authSlice';
 import { getProfile, logout } from '@/store/slices/userSlice';
+import type { AsyncRequestData } from '@/store/utils';
+import type { Profile } from '@/types/user';
 import { Alert, Button, Flex, Form, Input, Spin } from 'antd';
 import FormItem from 'antd/es/form/FormItem';
 import { useEffect } from 'react';
@@ -18,7 +20,7 @@ function ProfilePage() {
     data: profile,
     status: { isLoading },
     error,
-  }: ReturnType<typeof selectProfile> = useAppSelector(selectProfile);
+  }: AsyncRequestData<Profile> = useAppSelector(selectProfile);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 

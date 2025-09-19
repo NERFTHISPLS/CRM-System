@@ -13,6 +13,12 @@ export interface AsyncParticle<T = unknown> {
   status: 'idle' | 'pending' | 'fulfilled' | 'rejected';
 }
 
+export interface AsyncRequestData<T> {
+  data: T | null;
+  error: string | null;
+  status: AsyncDataStatus;
+}
+
 export function initAsyncParticle<T>(data: T | null = null): AsyncParticle<T> {
   return { data, error: null, status: 'idle' };
 }
@@ -41,11 +47,9 @@ export function addAsyncBuilderCases<State, Returned, ThunkArg>(
     });
 }
 
-export function getAsyncRequestData<T>(stateParam: AsyncParticle<T>): {
-  data: T | null;
-  error: string | null;
-  status: AsyncDataStatus;
-} {
+export function getAsyncRequestData<T>(
+  stateParam: AsyncParticle<T>
+): AsyncRequestData<T> {
   return {
     data: stateParam.data,
     error: stateParam.error,

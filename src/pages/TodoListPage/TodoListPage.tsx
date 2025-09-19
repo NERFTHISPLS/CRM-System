@@ -7,6 +7,8 @@ import { Alert, Flex, Spin } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchTodos } from '@/store/slices/todosSlice';
 import { selectTodosList } from '@/store/selectors';
+import type { AsyncRequestData } from '@/store/utils';
+import type { GetTodoResponse } from '@/types/todo';
 
 const REFETCH_TODOS_INTERVAL_MS = 5000;
 
@@ -15,7 +17,7 @@ function TodoListPage(): JSX.Element {
   const {
     status: { isLoading },
     error,
-  }: ReturnType<typeof selectTodosList> = useAppSelector(selectTodosList);
+  }: AsyncRequestData<GetTodoResponse> = useAppSelector(selectTodosList);
   const [showLoader, setShowLoader] = useState<boolean>(false);
 
   // On the initial render useEffect will run fetchTodos and fetchTodos will cause rerendering.

@@ -5,6 +5,8 @@ import {
   setIsAuthenticated,
   setIsInitialized,
 } from '@/store/slices/authSlice';
+import type { AsyncRequestData } from '@/store/utils';
+import type { Token } from '@/types/auth';
 import { tokenService } from '@/utils/tokenService';
 import { Flex, Spin } from 'antd';
 import { useEffect, type ReactNode } from 'react';
@@ -18,7 +20,7 @@ function AuthInitializer({ children }: Props): ReactNode {
   const isInitialized: boolean = useAppSelector(selectIsInitialized);
   const {
     status: { isLoading },
-  }: ReturnType<typeof selectAuthSignIn> = useAppSelector(selectAuthSignIn);
+  }: AsyncRequestData<Token> = useAppSelector(selectAuthSignIn);
 
   useEffect(() => {
     async function init(): Promise<void> {
