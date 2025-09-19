@@ -1,8 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import {
-  selectAuthSignInIsLoading,
-  selectIsInitialized,
-} from '@/store/selectors';
+import { selectIsInitialized, selectAuthSignIn } from '@/store/selectors';
 import {
   fetchTokens,
   setIsAuthenticated,
@@ -19,7 +16,9 @@ interface Props {
 function AuthInitializer({ children }: Props): ReactNode {
   const dispatch = useAppDispatch();
   const isInitialized: boolean = useAppSelector(selectIsInitialized);
-  const isLoading: boolean = useAppSelector(selectAuthSignInIsLoading);
+  const {
+    status: { isLoading },
+  }: ReturnType<typeof selectAuthSignIn> = useAppSelector(selectAuthSignIn);
 
   useEffect(() => {
     async function init(): Promise<void> {

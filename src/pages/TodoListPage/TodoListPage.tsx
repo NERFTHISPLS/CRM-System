@@ -5,18 +5,17 @@ import TodosFilter from '@/components/Todos/TodosFilter/TodosFilter';
 import TodoList from '@/components/Todos/TodoList/TodoList';
 import { Alert, Flex, Spin } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import {
-  selectTodosListError,
-  selectTodosListIsLoading,
-} from '@/store/selectors';
 import { fetchTodos } from '@/store/slices/todosSlice';
+import { selectTodosList } from '@/store/selectors';
 
 const REFETCH_TODOS_INTERVAL_MS = 5000;
 
 function TodoListPage(): JSX.Element {
   const dispatch = useAppDispatch();
-  const isLoading: boolean = useAppSelector(selectTodosListIsLoading);
-  const error: string | null = useAppSelector(selectTodosListError);
+  const {
+    status: { isLoading },
+    error,
+  }: ReturnType<typeof selectTodosList> = useAppSelector(selectTodosList);
   const [showLoader, setShowLoader] = useState<boolean>(false);
 
   // On the initial render useEffect will run fetchTodos and fetchTodos will cause rerendering.

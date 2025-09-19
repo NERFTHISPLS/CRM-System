@@ -19,15 +19,15 @@ import {
 export interface AuthState {
   isAuthenticated: boolean;
   isInitialized: boolean;
-  signIn: AsyncParticle;
-  fetchTokens: AsyncParticle;
+  signIn: AsyncParticle<Token>;
+  fetchTokens: AsyncParticle<Token>;
 }
 
 const initialState: AuthState = {
   isAuthenticated: false,
   isInitialized: false,
-  signIn: initAsyncParticle(),
-  fetchTokens: initAsyncParticle(),
+  signIn: initAsyncParticle<Token>(),
+  fetchTokens: initAsyncParticle<Token>(),
 };
 
 export const fetchTokens = createAsyncThunk<

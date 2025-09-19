@@ -41,16 +41,6 @@ export function addAsyncBuilderCases<State, Returned, ThunkArg>(
     });
 }
 
-export function getAsyncDataStatus(
-  dataStatus: AsyncParticle['status']
-): AsyncDataStatus {
-  return {
-    hasError: dataStatus === 'rejected',
-    isIdle: dataStatus === 'idle',
-    isLoading: dataStatus === 'pending',
-  };
-}
-
 export function getAsyncRequestData<T>(stateParam: AsyncParticle<T>): {
   data: T | null;
   error: string | null;
@@ -60,5 +50,15 @@ export function getAsyncRequestData<T>(stateParam: AsyncParticle<T>): {
     data: stateParam.data,
     error: stateParam.error,
     status: getAsyncDataStatus(stateParam.status),
+  };
+}
+
+function getAsyncDataStatus(
+  dataStatus: AsyncParticle['status']
+): AsyncDataStatus {
+  return {
+    hasError: dataStatus === 'rejected',
+    isIdle: dataStatus === 'idle',
+    isLoading: dataStatus === 'pending',
   };
 }

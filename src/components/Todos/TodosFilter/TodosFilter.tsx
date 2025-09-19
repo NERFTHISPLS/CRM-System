@@ -1,8 +1,8 @@
-import type { TodoFilterValue, TodoInfo } from '@/types/todo';
+import type { TodoFilterValue } from '@/types/todo';
 import type { JSX } from 'react';
 import { Tabs, type TabsProps } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { selectTodosFilterValue, selectTodosListInfo } from '@/store/selectors';
+import { selectTodosFilterValue, selectTodosList } from '@/store/selectors';
 import { setFilterValue, fetchTodos } from '@/store/slices/todosSlice';
 
 interface TabConfig {
@@ -18,10 +18,11 @@ const TAB_CONFIG: TabConfig[] = [
 
 function TodosFilter(): JSX.Element | null {
   const dispatch = useAppDispatch();
-  const countInfo: TodoInfo | null = useAppSelector(selectTodosListInfo);
+  const { data }: ReturnType<typeof selectTodosList> =
+    useAppSelector(selectTodosList);
   const activeKey: TodoFilterValue = useAppSelector(selectTodosFilterValue);
 
-  if (!countInfo) {
+  if (!data) {
     return null;
   }
 
@@ -29,7 +30,7 @@ function TodosFilter(): JSX.Element | null {
     key: tab.key,
     label: (
       <>
-        <span>{tab.label}</span> <span>({countInfo[tab.key]})</span>
+        <span>{tab.label}</span> <span>({data.info[tab.key]})</span>
       </>
     ),
   }));

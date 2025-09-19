@@ -19,8 +19,8 @@ export interface UserState {
 const initialState: UserState = {
   isLoading: false,
   error: null,
-  getProfile: initAsyncParticle(),
-  logout: initAsyncParticle(),
+  getProfile: initAsyncParticle<Profile>(),
+  logout: initAsyncParticle<void>(),
 };
 
 export const getProfile = createAsyncThunk<

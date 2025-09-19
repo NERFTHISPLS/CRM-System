@@ -3,21 +3,21 @@ import type { JSX } from 'react';
 import { List, message } from 'antd';
 import { useAppSelector } from '@/store/hooks';
 import { selectTodosList } from '@/store/selectors';
-import type { Todo } from '@/types/todo';
 
 function TodoList(): JSX.Element {
   // We use messageApi here instead of the TodoItem because of the todo deletion.
   // When a todo is deleted, the TodoItem component is removed from the DOM before
   // the success message has a chance to be displayed.
   const [messageApi, contextHolder] = message.useMessage();
-  const todos: Todo[] = useAppSelector(selectTodosList);
+  const { data }: ReturnType<typeof selectTodosList> =
+    useAppSelector(selectTodosList);
 
   return (
     <>
       {contextHolder}
       <List
         size="small"
-        dataSource={todos}
+        dataSource={data?.data ?? []}
         split={false}
         renderItem={(todo) => (
           <List.Item key={todo.id}>

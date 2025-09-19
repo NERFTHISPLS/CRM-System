@@ -30,7 +30,7 @@ export interface TodosState {
 
 const initialState: TodosState = {
   filterValue: 'all',
-  fetchTodos: initAsyncParticle(),
+  fetchTodos: initAsyncParticle<GetTodoResponse>(),
 };
 
 export const fetchTodos = createAsyncThunk<

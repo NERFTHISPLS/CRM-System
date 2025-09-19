@@ -1,8 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import {
-  selectAuthFetchTokensError,
-  selectAuthSignInError,
-} from '@/store/selectors';
+import { selectAuthFetchTokens, selectAuthSignIn } from '@/store/selectors';
 import { setIsAuthenticated, signIn } from '@/store/slices/authSlice';
 import { Alert, Button, Flex, Form, Input, type FormProps } from 'antd';
 import { type JSX } from 'react';
@@ -14,10 +11,10 @@ interface FormField {
 }
 
 function SignInPage(): JSX.Element {
-  const signInError: string | null = useAppSelector(selectAuthSignInError);
-  const fetchTokensError: string | null = useAppSelector(
-    selectAuthFetchTokensError
-  );
+  const { error: signInError }: ReturnType<typeof selectAuthSignIn> =
+    useAppSelector(selectAuthSignIn);
+  const { error: fetchTokensError }: ReturnType<typeof selectAuthFetchTokens> =
+    useAppSelector(selectAuthFetchTokens);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
