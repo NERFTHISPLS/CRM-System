@@ -15,6 +15,6 @@ export const TODO_TITLE_INPUT_RULES: Rule[] = [
   },
   {
     max: MAX_TODO_TITLE_LENGTH,
-    message: `Task must be at least ${MAX_TODO_TITLE_LENGTH} characters`,
+    message: `Task can't be longer than ${MAX_TODO_TITLE_LENGTH} characters`,
   },
 ];

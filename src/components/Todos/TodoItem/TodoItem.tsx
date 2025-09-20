@@ -1,5 +1,4 @@
 import { useState, type JSX } from 'react';
-import { removeTodo, updateTodo } from '@/api/todo';
 import { getErrorMessage } from '@utils/helpers';
 import styles from './TodoItem.module.scss';
 import type { Todo } from '@/types/todo';
@@ -20,6 +19,8 @@ import {
 } from 'antd';
 import { TODO_TITLE_INPUT_RULES } from '@/utils/constants';
 import type { MessageInstance } from 'antd/es/message/interface';
+import { useAppDispatch } from '@/store/hooks';
+import { removeTodo, updateTodo, fetchTodos } from '@/store/slices/todosSlice';
 
 interface FormField {
   todoTitle: string;
@@ -28,10 +29,10 @@ interface FormField {
 interface Props {
   todo: Todo;
   messageApi: MessageInstance;
-  refetchTodos: () => Promise<void>;
 }
 
-function TodoItem({ todo, messageApi, refetchTodos }: Props): JSX.Element {
+function TodoItem({ todo, messageApi }: Props): JSX.Element {
+  const dispatch = useAppDispatch();
   const [form] = Form.useForm();
   const [isEditSession, setIsEditSession] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -44,8 +45,10 @@ function TodoItem({ todo, messageApi, refetchTodos }: Props): JSX.Element {
   async function handleTodoToggle(): Promise<void> {
     try {
       setIsLoading(true);
-      await updateTodo(todo.id, { isDone: !todo.isDone });
-      await refetchTodos();
+      await dispatch(
+        updateTodo({ id: todo.id, fields: { isDone: !todo.isDone } })
+      ).unwrap();
+      await dispatch(fetchTodos());
     } catch (err) {
       messageApi.error(getErrorMessage(err));
     } finally {
@@ -65,8 +68,10 @@ function TodoItem({ todo, messageApi, refetchTodos }: Props): JSX.Element {
 
     try {
       setIsLoading(true);
-      await updateTodo(todo.id, { title: todoTitleTrimmed });
-      await refetchTodos();
+      await dispatch(
+        updateTodo({ id: todo.id, fields: { title: todoTitleTrimmed } })
+      ).unwrap();
+      await dispatch(fetchTodos());
       messageApi.success('Task was updated successfully');
     } catch (err) {
       messageApi.error(getErrorMessage(err));
@@ -79,8 +84,8 @@ function TodoItem({ todo, messageApi, refetchTodos }: Props): JSX.Element {
   async function handleRemoveTodo(): Promise<void> {
     try {
       setIsLoading(true);
-      await removeTodo(todo.id);
-      await refetchTodos();
+      await dispatch(removeTodo(todo.id)).unwrap();
+      await dispatch(fetchTodos());
       messageApi.success('Task was deleted successfully');
     } catch (err) {
       messageApi.error(getErrorMessage(err));
