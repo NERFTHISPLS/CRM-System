@@ -34,3 +34,12 @@ export const selectTodosFilterValue = createSelector(
 export const selectTodosList = createSelector(selectTodos, (todos) =>
   getAsyncRequestData(todos.fetchTodos)
 );
+
+const selectAdmin = (state: RootState) => state.admin;
+
+export const selectUsers = createSelector(selectAdmin, (admin) =>
+  getAsyncRequestData(admin.users)
+);
+export const selectUserProfile = createSelector(selectAdmin, (admin) =>
+  getAsyncRequestData(admin.selectedUser)
+);

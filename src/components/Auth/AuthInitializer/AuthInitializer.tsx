@@ -1,15 +1,14 @@
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { selectIsInitialized, selectAuthSignIn } from '@/store/selectors';
+import { selectIsInitialized } from '@/store/selectors';
 import {
   fetchTokens,
   setIsAuthenticated,
   setIsInitialized,
 } from '@/store/slices/authSlice';
-import type { AsyncRequestData } from '@/store/utils';
-import type { Token } from '@/types/auth';
+import { getProfile } from '@/store/slices/userSlice';
 import { tokenService } from '@/utils/tokenService';
 import { Flex, Spin } from 'antd';
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -18,25 +17,25 @@ interface Props {
 function AuthInitializer({ children }: Props): ReactNode {
   const dispatch = useAppDispatch();
   const isInitialized: boolean = useAppSelector(selectIsInitialized);
-  const {
-    status: { isLoading },
-  }: AsyncRequestData<Token> = useAppSelector(selectAuthSignIn);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     async function init(): Promise<void> {
-      const { refreshToken } = tokenService.getTokens();
-      if (refreshToken) {
-        try {
+      try {
+        const { refreshToken } = tokenService.getTokens();
+        if (refreshToken) {
           await dispatch(fetchTokens(refreshToken)).unwrap();
+          await dispatch(getProfile()).unwrap();
           dispatch(setIsAuthenticated(true));
-        } catch {
+        } else {
           dispatch(setIsAuthenticated(false));
         }
-      } else {
+      } catch {
         dispatch(setIsAuthenticated(false));
+      } finally {
+        dispatch(setIsInitialized(true));
+        setIsLoading(false);
       }
-
-      dispatch(setIsInitialized(true));
     }
 
     init();
