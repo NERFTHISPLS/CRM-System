@@ -93,38 +93,35 @@ function UsersPage(): JSX.Element {
     _,
     sorter
   ) => {
-    const newPage = pagination.current ?? 1;
-    const currentPage = (filters.page ?? 0) + 1;
+    const newPage = (pagination.current ?? 1) - 1;
 
-    if (newPage !== currentPage) {
-      setFilters((filters) => ({
-        ...filters,
-        page: newPage - 1,
-      }));
-    }
+    setFilters((prev) => {
+      const next: UserFilters = { ...prev };
 
-    if (Array.isArray(sorter)) {
-      return;
-    }
+      if (newPage !== prev.page) {
+        next.page = newPage;
+      }
 
-    if (
-      String(sorter.field) !== filters.sortBy ||
-      sorter.order !== filters.sortOrder
-    ) {
-      const sortOrderServer: UserFilters['sortOrder'] =
-        sorter.order === 'ascend'
-          ? 'asc'
-          : sorter.order === 'descend'
-          ? 'desc'
-          : undefined;
+      if (!Array.isArray(sorter)) {
+        const sortOrderServer: UserFilters['sortOrder'] =
+          sorter.order === 'ascend'
+            ? 'asc'
+            : sorter.order === 'descend'
+            ? 'desc'
+            : undefined;
 
-      setFilters((filters) => ({
-        ...filters,
-        page: 0,
-        sortBy: String(sorter.field),
-        sortOrder: sortOrderServer,
-      }));
-    }
+        if (
+          sorter.field !== prev.sortBy ||
+          sortOrderServer !== prev.sortOrder
+        ) {
+          next.sortBy = sorter.field ? String(sorter.field) : undefined;
+          next.sortOrder = sortOrderServer;
+          next.page = 0;
+        }
+      }
+
+      return next;
+    });
   };
 
   const handleSearch: InputProps['onChange'] = (e) => {
