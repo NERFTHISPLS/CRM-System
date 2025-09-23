@@ -1,5 +1,6 @@
 import type {
   GetUsersResponse,
+  Role,
   User,
   UserFilters,
   UserRequest,
@@ -15,6 +16,9 @@ import {
   getUsers,
   updateUserData,
   removeUser as removeUserApi,
+  blockUser as blockUserApi,
+  unblockUser as unblockUserApi,
+  changeUserRoles as changeUserRolesApi,
 } from '@/api/admin';
 import { getErrorMessage } from '@/utils/helpers';
 
@@ -77,6 +81,48 @@ export const removeUser = createAsyncThunk<
 >('admin/removeUser', async (id, { rejectWithValue }) => {
   try {
     await removeUserApi(id);
+  } catch (err) {
+    return rejectWithValue(getErrorMessage(err));
+  }
+});
+
+export const blockUser = createAsyncThunk<
+  User,
+  User['id'],
+  { rejectValue: string }
+>('admin/blockUser', async (id, { rejectWithValue }) => {
+  try {
+    const data = await blockUserApi(id);
+
+    return data;
+  } catch (err) {
+    return rejectWithValue(getErrorMessage(err));
+  }
+});
+
+export const unblockUser = createAsyncThunk<
+  User,
+  User['id'],
+  { rejectValue: string }
+>('admin/unblockUser', async (id, { rejectWithValue }) => {
+  try {
+    const data = await unblockUserApi(id);
+
+    return data;
+  } catch (err) {
+    return rejectWithValue(getErrorMessage(err));
+  }
+});
+
+export const changeUserRoles = createAsyncThunk<
+  User,
+  { id: User['id']; roles: Role[] },
+  { rejectValue: string }
+>('admin/changeUserRoles', async ({ id, roles }, { rejectWithValue }) => {
+  try {
+    const data = await changeUserRolesApi(id, { roles });
+
+    return data;
   } catch (err) {
     return rejectWithValue(getErrorMessage(err));
   }

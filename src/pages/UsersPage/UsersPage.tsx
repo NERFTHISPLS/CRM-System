@@ -2,6 +2,7 @@ import type { GetUsersResponse, Role, User, UserFilters } from '@/types/user';
 import {
   Alert,
   Button,
+  Checkbox,
   Dropdown,
   Flex,
   Input,
@@ -11,6 +12,7 @@ import {
   Table,
   Tag,
   Tooltip,
+  type CheckboxOptionType,
   type InputProps,
   type MenuProps,
   type TableProps,
@@ -19,14 +21,22 @@ import {
   ArrowRightOutlined,
   DeleteOutlined,
   FilterOutlined,
+  MoreOutlined,
   SearchOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import { useEffect, useRef, useState, type JSX } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { selectUsers } from '@/store/selectors';
 import type { AsyncRequestData } from '@/store/utils';
-import { fetchUsers, removeUser } from '@/store/slices/adminSlice';
+import {
+  fetchUsers,
+  removeUser,
+  blockUser,
+  unblockUser,
+  changeUserRoles,
+} from '@/store/slices/adminSlice';
 import { getErrorMessage } from '@/utils/helpers';
 
 const { Column } = Table;
@@ -37,12 +47,29 @@ const roleLabelsMap: Record<Role, string> = {
   MODERATOR: 'Moderator',
 };
 
+const roleCheckboxOptions: CheckboxOptionType<Role>[] = Object.keys(
+  roleLabelsMap
+).map((key) => {
+  const role = key as Role;
+
+  return {
+    value: role,
+    label: roleLabelsMap[role],
+  };
+});
+
 const filterMenuItems: MenuProps['items'] = [
   { key: 'all', label: 'All' },
   { key: 'blocked', label: 'Blocked' },
   { key: 'not-blocked', label: 'Not blocked' },
 ];
 
+const actionsMenuItems: MenuProps['items'] = [
+  { key: 'edit-roles', label: 'Edit roles', icon: <UserOutlined /> },
+  { key: 'delete', label: 'Delete', icon: <DeleteOutlined />, danger: true },
+];
+
+const MODAL_CONFIRM_TITLE = 'Operation confirmation';
 const USERS_PER_PAGE = 20;
 const DEBOUNCE_MS = 300;
 
@@ -53,14 +80,23 @@ function UsersPage(): JSX.Element {
     error,
   }: AsyncRequestData<GetUsersResponse> = useAppSelector(selectUsers);
   const dispatch = useAppDispatch();
+
   const navigate = useNavigate();
+
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [filters, setFilters] = useState<UserFilters>({
     page: 0,
     limit: USERS_PER_PAGE,
   });
-  const [modalCurrentUser, setModalCurrentUser] = useState<User | null>(null);
-  const [isRemovingUser, setIsRemovingUser] = useState<boolean>(false);
+
+  const [modalRemovingUser, setModalRemovingUser] = useState<User | null>(null);
+  const [modalTogglingBlockUser, setModalTogglingBlockUser] =
+    useState<User | null>(null);
+  const [modalEdittingRolesUser, setModalEdittingRolesUser] =
+    useState<User | null>(null);
+  const [modalSelectedRoles, setModalSelectedRoles] = useState<Role[]>([]);
+  const [isProcessingUser, setIsProcessingUser] = useState<boolean>(false);
+
   const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
@@ -92,7 +128,6 @@ function UsersPage(): JSX.Element {
   }
 
   const totalUsers = data?.meta.totalAmount || 0;
-
   const showPagination = totalUsers > USERS_PER_PAGE;
 
   const handleTablePage: TableProps<User>['onChange'] = (
@@ -159,23 +194,103 @@ function UsersPage(): JSX.Element {
 
   async function handleRemoveUser(): Promise<void> {
     try {
-      setIsRemovingUser(true);
+      setIsProcessingUser(true);
 
-      if (!modalCurrentUser) {
+      if (!modalRemovingUser) {
         throw new Error('No such user exists');
       }
 
-      await dispatch(removeUser(modalCurrentUser.id));
+      await dispatch(removeUser(modalRemovingUser.id));
       await dispatch(fetchUsers(filters));
 
       messageApi.success(
-        `User ${modalCurrentUser.username} was deleted successfully`
+        `User ${modalRemovingUser.username} was deleted successfully`
       );
     } catch (err) {
       messageApi.error(getErrorMessage(err));
     } finally {
-      setIsRemovingUser(false);
-      setModalCurrentUser(null);
+      setIsProcessingUser(false);
+      setModalRemovingUser(null);
+    }
+  }
+
+  async function handleToggleUserBlockStatus(): Promise<void> {
+    try {
+      setIsProcessingUser(true);
+
+      if (!modalTogglingBlockUser) {
+        throw new Error('No such user exists');
+      }
+
+      const { id, isBlocked, username } = modalTogglingBlockUser;
+
+      if (isBlocked) {
+        await dispatch(unblockUser(id));
+      } else {
+        await dispatch(blockUser(id));
+      }
+
+      await dispatch(fetchUsers(filters));
+
+      messageApi.success(
+        `User ${username} was ${
+          isBlocked ? 'unblocked' : 'blocked'
+        } successfully`
+      );
+    } catch (err) {
+      messageApi.error(getErrorMessage(err));
+    } finally {
+      setIsProcessingUser(false);
+      setModalTogglingBlockUser(null);
+    }
+  }
+
+  async function handleEditUserRoles(): Promise<void> {
+    try {
+      setIsProcessingUser(true);
+
+      if (!modalEdittingRolesUser) {
+        throw new Error('No such user exists');
+      }
+
+      const { id, username, roles: oldRoles } = modalEdittingRolesUser;
+
+      const oldRolesSet = new Set(oldRoles);
+      const newRolesSet = new Set(modalSelectedRoles);
+
+      if (
+        oldRolesSet.size === newRolesSet.size &&
+        [...oldRolesSet].every((role) => newRolesSet.has(role))
+      ) {
+        return;
+      }
+
+      await dispatch(
+        changeUserRoles({
+          id,
+          roles: modalSelectedRoles.length > 0 ? modalSelectedRoles : ['USER'],
+        })
+      );
+      await dispatch(fetchUsers(filters));
+
+      messageApi.success(
+        `Roles of the user ${username} were changed successfully`
+      );
+    } catch (err) {
+      messageApi.error(getErrorMessage(err));
+    } finally {
+      setIsProcessingUser(false);
+      setModalEdittingRolesUser(null);
+      setModalSelectedRoles([]);
+    }
+  }
+
+  function handleActionsMenuClick(key: string, targetUser: User) {
+    if (key === 'delete') {
+      setModalRemovingUser(targetUser);
+    } else if (key === 'edit-roles') {
+      setModalEdittingRolesUser(targetUser);
+      setModalSelectedRoles(targetUser.roles);
     }
   }
 
@@ -295,36 +410,88 @@ function UsersPage(): JSX.Element {
                   />
                 </Tooltip>
 
-                <Tooltip title="Delete user">
-                  <Button
-                    variant="outlined"
-                    color="danger"
-                    icon={<DeleteOutlined />}
-                    onClick={() => setModalCurrentUser(record)}
-                  />
-                </Tooltip>
+                <Button
+                  variant="outlined"
+                  style={{ minWidth: 90 }}
+                  onClick={() => setModalTogglingBlockUser(record)}
+                >
+                  {record.isBlocked ? 'Unblock' : 'Block'}
+                </Button>
+
+                <Dropdown
+                  menu={{
+                    items: actionsMenuItems,
+                    onClick: ({ key }) => handleActionsMenuClick(key, record),
+                  }}
+                >
+                  <Button variant="outlined" icon={<MoreOutlined />} />
+                </Dropdown>
               </Space>
             )}
           />
         </Table>
-
-        <Modal
-          title="Operation confirmation"
-          closable={true}
-          centered={true}
-          okText="Yes"
-          confirmLoading={isRemovingUser}
-          okButtonProps={{ color: 'danger', variant: 'outlined' }}
-          open={Boolean(modalCurrentUser)}
-          onOk={handleRemoveUser}
-          onCancel={() => setModalCurrentUser(null)}
-        >
-          <p>
-            Are you sure you want to delete user {modalCurrentUser?.username}{' '}
-            with id {modalCurrentUser?.id}?
-          </p>
-        </Modal>
       </Flex>
+
+      <Modal
+        title={MODAL_CONFIRM_TITLE}
+        closable
+        centered
+        okText="Yes"
+        confirmLoading={isProcessingUser}
+        okButtonProps={{ color: 'danger', variant: 'outlined' }}
+        open={Boolean(modalRemovingUser)}
+        onOk={handleRemoveUser}
+        onCancel={() => setModalRemovingUser(null)}
+      >
+        <p>
+          Are you sure you want to delete user {modalRemovingUser?.username}{' '}
+          with id {modalRemovingUser?.id}?
+        </p>
+      </Modal>
+
+      <Modal
+        title="Edit roles"
+        closable
+        centered
+        confirmLoading={isProcessingUser}
+        open={Boolean(modalEdittingRolesUser)}
+        onOk={handleEditUserRoles}
+        onCancel={() => {
+          setModalEdittingRolesUser(null);
+          setModalSelectedRoles([]);
+        }}
+      >
+        <Flex vertical gap="small">
+          <p>
+            Edit roles for user {modalEdittingRolesUser?.username} with id{' '}
+            {modalEdittingRolesUser?.id}
+          </p>
+
+          <Checkbox.Group
+            value={modalSelectedRoles}
+            options={roleCheckboxOptions}
+            onChange={(roles: Role[]) => setModalSelectedRoles(roles)}
+          />
+        </Flex>
+      </Modal>
+
+      <Modal
+        title={MODAL_CONFIRM_TITLE}
+        closable
+        centered
+        okText="Yes"
+        confirmLoading={isProcessingUser}
+        open={Boolean(modalTogglingBlockUser)}
+        onOk={handleToggleUserBlockStatus}
+        onCancel={() => setModalTogglingBlockUser(null)}
+      >
+        <p>
+          Are you sure you want to{' '}
+          {modalTogglingBlockUser?.isBlocked ? 'unblock' : 'block'} user{' '}
+          {modalTogglingBlockUser?.username} with id{' '}
+          {modalTogglingBlockUser?.id}?
+        </p>
+      </Modal>
     </>
   );
 }

@@ -3,6 +3,7 @@ import type {
   User,
   UserFilters,
   UserRequest,
+  UserRolesRequest,
 } from '@/types/user';
 import { apiClient } from './apiClient';
 
@@ -33,4 +34,25 @@ export async function updateUserData(
 
 export async function removeUser(id: User['id']): Promise<void> {
   await apiClient.delete<void>(`/admin/users/${id}`);
+}
+
+export async function blockUser(id: User['id']): Promise<User> {
+  const res = await apiClient.post<User>(`/admin/users/${id}/block`);
+
+  return res.data;
+}
+
+export async function unblockUser(id: User['id']): Promise<User> {
+  const res = await apiClient.post<User>(`/admin/users/${id}/unblock`);
+
+  return res.data;
+}
+
+export async function changeUserRoles(
+  id: User['id'],
+  roles: UserRolesRequest
+): Promise<User> {
+  const res = await apiClient.post<User>(`/admin/users/${id}/rights`, roles);
+
+  return res.data;
 }
