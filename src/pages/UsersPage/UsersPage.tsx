@@ -5,6 +5,8 @@ import {
   Dropdown,
   Flex,
   Input,
+  message,
+  Modal,
   Space,
   Table,
   Tag,
@@ -15,6 +17,7 @@ import {
 } from 'antd';
 import {
   ArrowRightOutlined,
+  DeleteOutlined,
   FilterOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
@@ -23,7 +26,8 @@ import { useEffect, useRef, useState, type JSX } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { selectUsers } from '@/store/selectors';
 import type { AsyncRequestData } from '@/store/utils';
-import { fetchUsers } from '@/store/slices/adminSlice';
+import { fetchUsers, removeUser } from '@/store/slices/adminSlice';
+import { getErrorMessage } from '@/utils/helpers';
 
 const { Column } = Table;
 
@@ -55,6 +59,9 @@ function UsersPage(): JSX.Element {
     page: 0,
     limit: USERS_PER_PAGE,
   });
+  const [modalCurrentUser, setModalCurrentUser] = useState<User | null>(null);
+  const [isRemovingUser, setIsRemovingUser] = useState<boolean>(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     async function getUsers(): Promise<void> {
@@ -150,123 +157,175 @@ function UsersPage(): JSX.Element {
     }));
   };
 
+  async function handleRemoveUser(): Promise<void> {
+    try {
+      setIsRemovingUser(true);
+
+      if (!modalCurrentUser) {
+        throw new Error('No such user exists');
+      }
+
+      await dispatch(removeUser(modalCurrentUser.id));
+      await dispatch(fetchUsers(filters));
+
+      messageApi.success(
+        `User ${modalCurrentUser.username} was deleted successfully`
+      );
+    } catch (err) {
+      messageApi.error(getErrorMessage(err));
+    } finally {
+      setIsRemovingUser(false);
+      setModalCurrentUser(null);
+    }
+  }
+
   return (
-    <Flex vertical gap="middle" style={{ padding: '1rem' }}>
-      <h2>Users Info</h2>
+    <>
+      {contextHolder}
+      <Flex vertical gap="middle" style={{ padding: '1rem' }}>
+        <h2>Users Info</h2>
 
-      <Flex gap="small">
-        <Input
-          prefix={<SearchOutlined />}
-          placeholder="Search by username or email..."
-          onChange={handleSearch}
-        />
+        <Flex gap="small">
+          <Input
+            prefix={<SearchOutlined />}
+            placeholder="Search by username or email..."
+            onChange={handleSearch}
+          />
 
-        <Dropdown
-          menu={{
-            items: filterMenuItems,
-            selectable: true,
-            defaultSelectedKeys: ['all'],
-            onClick: handleFilterChange,
+          <Dropdown
+            menu={{
+              items: filterMenuItems,
+              selectable: true,
+              defaultSelectedKeys: ['all'],
+              onClick: handleFilterChange,
+            }}
+          >
+            <Button>
+              <Space>
+                <FilterOutlined />
+                Filter
+              </Space>
+            </Button>
+          </Dropdown>
+        </Flex>
+
+        <Table<User>
+          dataSource={data?.data ?? []}
+          rowKey="id"
+          loading={isLoading}
+          pagination={{
+            total: totalUsers,
+            position: [showPagination ? 'bottomCenter' : 'none'],
+            pageSize: USERS_PER_PAGE,
+            showSizeChanger: false,
+            current: (filters.page ?? 0) + 1,
           }}
+          scroll={{ x: 'max-content', scrollToFirstRowOnChange: true }}
+          onChange={handleTablePage}
         >
-          <Button>
-            <Space>
-              <FilterOutlined />
-              Filter
-            </Space>
-          </Button>
-        </Dropdown>
+          <Column
+            title="Username"
+            dataIndex="username"
+            key="username"
+            fixed="left"
+            sorter={true}
+          />
+
+          <Column title="Email" dataIndex="email" key="email" sorter={true} />
+
+          <Column
+            title="Registration date"
+            dataIndex="date"
+            key="date"
+            render={(date: string) =>
+              new Intl.DateTimeFormat().format(new Date(date))
+            }
+          />
+
+          <Column
+            title="Is blocked"
+            dataIndex="isBlocked"
+            key="isBlocked"
+            render={(isBlocked: boolean) => (isBlocked ? '+' : '-')}
+          />
+
+          <Column
+            title="Roles"
+            dataIndex="roles"
+            key="roles"
+            render={(roles: Role[]) =>
+              roles.map((role) => {
+                let color = '';
+                switch (role) {
+                  case 'ADMIN':
+                    color = 'geekblue';
+                    break;
+                  case 'MODERATOR':
+                    color = 'orange';
+                    break;
+                  case 'USER':
+                    color = 'purple';
+                    break;
+                }
+
+                return (
+                  <Tag color={color} key={role}>
+                    {roleLabelsMap[role]}
+                  </Tag>
+                );
+              })
+            }
+          />
+
+          <Column
+            title="Phone number"
+            dataIndex="phoneNumber"
+            key="phoneNumber"
+          />
+
+          <Column
+            key="actions"
+            render={(_, record: User) => (
+              <Space>
+                <Tooltip title="Go to the profile">
+                  <Button
+                    variant="outlined"
+                    icon={<ArrowRightOutlined />}
+                    onClick={() => navigate(`/users/user-profile/${record.id}`)}
+                  />
+                </Tooltip>
+
+                <Tooltip title="Delete user">
+                  <Button
+                    variant="outlined"
+                    color="danger"
+                    icon={<DeleteOutlined />}
+                    onClick={() => setModalCurrentUser(record)}
+                  />
+                </Tooltip>
+              </Space>
+            )}
+          />
+        </Table>
+
+        <Modal
+          title="Operation confirmation"
+          closable={true}
+          centered={true}
+          okText="Yes"
+          confirmLoading={isRemovingUser}
+          okButtonProps={{ color: 'danger', variant: 'outlined' }}
+          open={Boolean(modalCurrentUser)}
+          onOk={handleRemoveUser}
+          onCancel={() => setModalCurrentUser(null)}
+        >
+          <p>
+            Are you sure you want to delete user {modalCurrentUser?.username}{' '}
+            with id {modalCurrentUser?.id}?
+          </p>
+        </Modal>
       </Flex>
-
-      <Table<User>
-        dataSource={data?.data ?? []}
-        rowKey="id"
-        loading={isLoading}
-        pagination={{
-          total: totalUsers,
-          position: [showPagination ? 'bottomCenter' : 'none'],
-          pageSize: USERS_PER_PAGE,
-          showSizeChanger: false,
-          current: (filters.page ?? 0) + 1,
-        }}
-        scroll={{ x: 'max-content', scrollToFirstRowOnChange: true }}
-        onChange={handleTablePage}
-      >
-        <Column
-          title="Username"
-          dataIndex="username"
-          key="username"
-          fixed="left"
-          sorter={true}
-        />
-
-        <Column title="Email" dataIndex="email" key="email" sorter={true} />
-
-        <Column
-          title="Registration date"
-          dataIndex="date"
-          key="date"
-          render={(date: string) =>
-            new Intl.DateTimeFormat().format(new Date(date))
-          }
-        />
-
-        <Column
-          title="Is blocked"
-          dataIndex="isBlocked"
-          key="isBlocked"
-          render={(isBlocked: boolean) => (isBlocked ? '+' : '-')}
-        />
-
-        <Column
-          title="Roles"
-          dataIndex="roles"
-          key="roles"
-          render={(roles: Role[]) =>
-            roles.map((role) => {
-              let color = '';
-              switch (role) {
-                case 'ADMIN':
-                  color = 'geekblue';
-                  break;
-                case 'MODERATOR':
-                  color = 'orange';
-                  break;
-                case 'USER':
-                  color = 'purple';
-                  break;
-              }
-
-              return (
-                <Tag color={color} key={role}>
-                  {roleLabelsMap[role]}
-                </Tag>
-              );
-            })
-          }
-        />
-
-        <Column
-          title="Phone number"
-          dataIndex="phoneNumber"
-          key="phoneNumber"
-        />
-
-        <Column
-          key="actions"
-          render={(_, record: User) => (
-            <Space>
-              <Tooltip title="Go to the profile">
-                <Button
-                  icon={<ArrowRightOutlined />}
-                  onClick={() => navigate(`/users/user-profile/${record.id}`)}
-                />
-              </Tooltip>
-            </Space>
-          )}
-        />
-      </Table>
-    </Flex>
+    </>
   );
 }
 

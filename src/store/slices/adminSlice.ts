@@ -10,7 +10,12 @@ import {
   type AsyncParticle,
 } from '../utils';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getUserById, getUsers, updateUserData } from '@/api/admin';
+import {
+  getUserById,
+  getUsers,
+  updateUserData,
+  removeUser as removeUserApi,
+} from '@/api/admin';
 import { getErrorMessage } from '@/utils/helpers';
 
 export interface AdminState {
@@ -60,6 +65,18 @@ export const updateUser = createAsyncThunk<
     const data = await updateUserData(id, fields);
 
     return data;
+  } catch (err) {
+    return rejectWithValue(getErrorMessage(err));
+  }
+});
+
+export const removeUser = createAsyncThunk<
+  void,
+  User['id'],
+  { rejectValue: string }
+>('admin/removeUser', async (id, { rejectWithValue }) => {
+  try {
+    await removeUserApi(id);
   } catch (err) {
     return rejectWithValue(getErrorMessage(err));
   }

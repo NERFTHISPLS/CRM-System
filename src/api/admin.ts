@@ -30,3 +30,7 @@ export async function updateUserData(
 
   return res.data;
 }
+
+export async function removeUser(id: User['id']): Promise<void> {
+  await apiClient.delete<void>(`/admin/users/${id}`);
+}
