@@ -8,7 +8,6 @@ import TodoListPage from '@/pages/TodoListPage/TodoListPage';
 import ProfilePage from '@/pages/ProfilePage/ProfilePage';
 import { createBrowserRouter } from 'react-router';
 import UsersPage from '@/pages/UsersPage/UsersPage';
-import ProtectedAdminRoute from '@/components/Auth/ProtectedAdminRoute/ProtectedAdminRoute';
 import SelectedProfilePage from '@/pages/SelectedProfilePage/SelectedProfilePage';
 
 export const router = createBrowserRouter([
@@ -26,17 +25,17 @@ export const router = createBrowserRouter([
       {
         path: 'users',
         element: (
-          <ProtectedAdminRoute>
+          <ProtectedRoute availableRoles={['ADMIN', 'MODERATOR']}>
             <UsersPage />
-          </ProtectedAdminRoute>
+          </ProtectedRoute>
         ),
       },
       {
         path: 'users/user-profile/:id',
         element: (
-          <ProtectedAdminRoute>
+          <ProtectedRoute availableRoles={['ADMIN', 'MODERATOR']}>
             <SelectedProfilePage />
-          </ProtectedAdminRoute>
+          </ProtectedRoute>
         ),
       },
     ],

@@ -24,6 +24,23 @@ import FormItem from 'antd/es/form/FormItem';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
 
+function getChangedFields<T extends object>(
+  original: T,
+  updated: T
+): Partial<T> {
+  const changedFields: Partial<T> = {};
+
+  Object.keys(original).forEach((key) => {
+    const fieldKey = key as keyof T;
+
+    if (original[fieldKey] !== updated[fieldKey]) {
+      changedFields[fieldKey] = original[fieldKey];
+    }
+  });
+
+  return changedFields;
+}
+
 interface FormField {
   username: string;
   email: string;
@@ -90,13 +107,7 @@ function SelectedProfilePage() {
       ])
     ) as FormField;
 
-    const changedFields: Partial<FormField> = {};
-    Object.keys(trimmedFormData).forEach((key) => {
-      const fieldKey = key as keyof FormField;
-      if (trimmedFormData[fieldKey] !== profile[fieldKey]) {
-        changedFields[fieldKey] = trimmedFormData[fieldKey];
-      }
-    });
+    const changedFields = getChangedFields(trimmedFormData, profile);
 
     if (!Object.keys(changedFields).length) {
       setIsEditSession(false);

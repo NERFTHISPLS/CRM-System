@@ -9,8 +9,7 @@ import {
 import { useAppSelector } from '@/store/hooks';
 import { selectProfile } from '@/store/selectors';
 import type { AsyncRequestData } from '@/store/utils';
-import type { Profile } from '@/types/user';
-import { isAdmin } from '@/utils/helpers';
+import type { Profile, Role } from '@/types/user';
 
 type MenuItem = Required<MenuProps>['items'][number];
 interface MenuItemConfig {
@@ -18,7 +17,7 @@ interface MenuItemConfig {
   label: ReactNode;
   icon: ReactNode;
   path: string;
-  adminOnly?: boolean;
+  allowedRoles: Role[];
 }
 
 const menuConfig: MenuItemConfig[] = [
@@ -27,19 +26,21 @@ const menuConfig: MenuItemConfig[] = [
     label: 'Todo List',
     icon: <UnorderedListOutlined />,
     path: '/todo-list',
+    allowedRoles: ['USER'],
   },
   {
     key: 'user-profile',
     label: 'Profile',
     icon: <UserOutlined />,
     path: '/user-profile',
+    allowedRoles: ['USER'],
   },
   {
     key: 'users',
     label: 'Users',
     icon: <AuditOutlined />,
     path: '/users',
-    adminOnly: true,
+    allowedRoles: ['ADMIN', 'MODERATOR'],
   },
 ];
 
@@ -53,13 +54,9 @@ function MenuNav() {
   }
 
   const menuItems: MenuItem[] = menuConfig
-    .filter((config) => {
-      if (config.adminOnly) {
-        return isAdmin(profile.roles);
-      }
-
-      return true;
-    })
+    .filter((config) =>
+      config.allowedRoles.some((role) => profile.roles.includes(role))
+    )
     .map((config) => ({
       key: config.key,
       label: <NavLink to={config.path}>{config.label}</NavLink>,
