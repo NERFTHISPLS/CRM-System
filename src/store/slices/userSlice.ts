@@ -37,13 +37,14 @@ export const getProfile = createAsyncThunk<
 
 export const logout = createAsyncThunk<void, void, { rejectValue: string }>(
   '/user/logout',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     try {
       await logoutApi();
     } catch (err) {
       return rejectWithValue(getErrorMessage(err));
     } finally {
       tokenService.clearTokens();
+      dispatch(clearProfile());
     }
   }
 );
@@ -51,11 +52,19 @@ export const logout = createAsyncThunk<void, void, { rejectValue: string }>(
 export const userSlice = createSlice({
   name: 'user',
   initialState,
-  reducers: {},
+  reducers: {
+    clearProfile(state) {
+      state.getProfile.data = null;
+      state.getProfile.error = null;
+      state.getProfile.status = 'idle';
+    },
+  },
   extraReducers: (builder) => {
     addAsyncBuilderCases(builder, getProfile, 'getProfile');
     addAsyncBuilderCases(builder, logout, 'logout');
   },
 });
+
+export const { clearProfile } = userSlice.actions;
 
 export default userSlice.reducer;

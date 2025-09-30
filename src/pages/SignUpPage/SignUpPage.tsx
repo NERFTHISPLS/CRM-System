@@ -4,6 +4,11 @@ import { Link } from 'react-router';
 import { signUp } from '@/api/auth';
 import { useState, type JSX, type ReactNode } from 'react';
 import { getErrorMessage } from '@/utils/helpers';
+import {
+  EMAIL_INPUT_RULES,
+  PHONE_NUMBER_INPUT_RULES,
+  USERNAME_INPUT_RULES,
+} from '@/utils/constants';
 
 interface FormField {
   username: string;
@@ -16,7 +21,6 @@ interface FormField {
 
 const MIN_LOGIN_LENGTH = 2;
 const MAX_LOGIN_LENGTH = 60;
-const MAX_USERNAME_LENGTH = 60;
 const MIN_PASSWORD_LENGTH = 6;
 const MAX_PASSWORD_LENGTH = 60;
 
@@ -78,17 +82,7 @@ function SignUpPage(): JSX.Element {
         <Form.Item<FormField>
           name="username"
           label="Username"
-          rules={[
-            { required: true, message: 'Please input your username' },
-            {
-              max: MAX_USERNAME_LENGTH,
-              message: `Username can't be longer than ${MAX_USERNAME_LENGTH} characters`,
-            },
-            {
-              pattern: /^[a-zA-Zа-яА-ЯёЁ]+$/,
-              message: 'Username can only contain Russian and English letters',
-            },
-          ]}
+          rules={USERNAME_INPUT_RULES}
         >
           <Input placeholder="John" disabled={isLoading} />
         </Form.Item>
@@ -158,13 +152,7 @@ function SignUpPage(): JSX.Element {
         <Form.Item<FormField>
           name="email"
           label="Email"
-          rules={[
-            { required: true, message: 'Please input your email' },
-            {
-              type: 'email',
-              message: 'Please enter a valid email address',
-            },
-          ]}
+          rules={EMAIL_INPUT_RULES}
         >
           <Input placeholder="example@mail.com" disabled={isLoading} />
         </Form.Item>
@@ -172,13 +160,7 @@ function SignUpPage(): JSX.Element {
         <Form.Item<FormField>
           name="phoneNumber"
           label="Phone number"
-          rules={[
-            {
-              // https://uibakery.io/regex-library/phone-number
-              pattern: /^\+?[1-9][0-9]{7,14}$/,
-              message: 'Please enter a valid phone number',
-            },
-          ]}
+          rules={PHONE_NUMBER_INPUT_RULES}
         >
           <Input placeholder="+71234567890" disabled={isLoading} />
         </Form.Item>
