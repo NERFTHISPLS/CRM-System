@@ -1,18 +1,15 @@
-import type { MetaResponse } from '@/types/general';
 import type {
+  GetTodoResponse,
   Todo,
   TodoFilterValue,
-  TodoInfo,
   TodoRequest,
 } from '@/types/todo';
-import axios from 'axios';
-
-const apiClient = axios.create({ baseURL: 'https://easydev.club/api/v1' });
+import { apiClient } from './apiClient';
 
 export async function getTodos(
   todoFilterValue: TodoFilterValue = 'all'
-): Promise<MetaResponse<Todo, TodoInfo>> {
-  const res = await apiClient.get<MetaResponse<Todo, TodoInfo>>('/todos', {
+): Promise<GetTodoResponse> {
+  const res = await apiClient.get<GetTodoResponse>('/todos', {
     params: { filter: todoFilterValue },
   });
 
@@ -37,5 +34,5 @@ export async function updateTodo(
 }
 
 export async function removeTodo(id: Todo['id']): Promise<void> {
-  await apiClient.delete(`todos/${id}`);
+  await apiClient.delete(`/todos/${id}`);
 }
